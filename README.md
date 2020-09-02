@@ -25,8 +25,7 @@ See `:help deoplete-options` for a complete list of options.
 
 - Rust
 ```shell
-# git clone https://github.com/racer-rust/racer.git
-# cd racer && cargo +nightly build --release
+# cargo install racer
 ```
 
 - Golang
