@@ -1,0 +1,10 @@
+g:necovim#complete_functions	necovim.txt	/*g:necovim#complete_functions*
+neco-vim	necovim.txt	/*neco-vim*
+necovim-commands	necovim.txt	/*necovim-commands*
+necovim-contents	necovim.txt	/*necovim-contents*
+necovim-faq	necovim.txt	/*necovim-faq*
+necovim-install	necovim.txt	/*necovim-install*
+necovim-interface	necovim.txt	/*necovim-interface*
+necovim-introduction	necovim.txt	/*necovim-introduction*
+necovim-variables	necovim.txt	/*necovim-variables*
+necovim.txt	necovim.txt	/*necovim.txt*
