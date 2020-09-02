@@ -9,7 +9,7 @@ This is a distribution of nvim plugins for linux
 # ./install.sh
 ```
 
-Run `:PlugInstall` to install plugins.
+Run `:PlugInstall` to install plugins, or `UpdateRemotePlugins` to update plugins.
 
 See `:help deoplete-options` for a complete list of options.
 
@@ -31,5 +31,5 @@ See `:help deoplete-options` for a complete list of options.
 
 - Golang
 ```shell
-# go install github.com/nsf/gocode
+# go get github.com/nsf/gocode
 ```
