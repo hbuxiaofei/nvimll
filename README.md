@@ -19,3 +19,17 @@ See `:help deoplete-options` for a complete list of options.
 ```shell
 # pip3 install pynvim
 ```
+
+
+## Language Setting
+
+- Rust
+```shell
+# git clone https://github.com/racer-rust/racer.git
+# cd racer && cargo +nightly build --release
+```
+
+- Golang
+```shell
+# go install github.com/nsf/gocode
+```
