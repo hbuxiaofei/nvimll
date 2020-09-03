@@ -6,7 +6,9 @@ Plug 'Shougo/neco-vim', { 'do': ':UpdateRemotePlugins' }
 Plug 'sickill/vim-monokai', { 'do': ':UpdateRemotePlugins' }
 Plug 'vim-airline/vim-airline', { 'do': ':UpdateRemotePlugins' }
 Plug 'majutsushi/tagbar', { 'do': ':UpdateRemotePlugins' }
+Plug 'preservim/nerdtree', { 'do': ':UpdateRemotePlugins' }
 Plug 'lfv89/vim-interestingwords', { 'do': ':UpdateRemotePlugins' }
+Plug 'jiangmiao/auto-pairs', { 'do': ':UpdateRemotePlugins' }
 
 Plug 'racer-rust/vim-racer', { 'do': ':UpdateRemotePlugins' }
 
@@ -77,6 +79,13 @@ let g:go_version_warning = 0
 let g:jedi#completions_enabled = 0
 
 
+" airline
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#buffer_nr_show = 1
+nmap <leader>- <Plug>AirlineSelectPrevTab
+nmap <leader>= <Plug>AirlineSelectNextTab
+nmap <Leader>+ :bd<cr>
+
 
 " tagbar
 let g:tagbar_left=1
@@ -84,3 +93,14 @@ let g:tagbar_width=30
 let g:tagbar_sort = 0
 let g:tagbar_compact = 1
 nmap <F5> :TagbarToggle<cr>
+
+
+" nerdtree
+let NERDChristmasTree=0
+let NERDTreeWinSize=30
+let NERDTreeChDirMode=2
+let NERDTreeIgnore=['\~$', '\.pyc$', '\.swp$']
+let NERDTreeShowBookmarks=1
+let NERDTreeWinPos = "right"
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+nmap <F7> :NERDTreeToggle<cr>
