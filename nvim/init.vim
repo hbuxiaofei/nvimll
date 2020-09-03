@@ -9,6 +9,7 @@ Plug 'majutsushi/tagbar', { 'do': ':UpdateRemotePlugins' }
 Plug 'preservim/nerdtree', { 'do': ':UpdateRemotePlugins' }
 Plug 'lfv89/vim-interestingwords', { 'do': ':UpdateRemotePlugins' }
 Plug 'jiangmiao/auto-pairs', { 'do': ':UpdateRemotePlugins' }
+Plug 'kien/ctrlp.vim', { 'do': ':UpdateRemotePlugins' }
 
 Plug 'racer-rust/vim-racer', { 'do': ':UpdateRemotePlugins' }
 
@@ -102,5 +103,7 @@ let NERDTreeChDirMode=2
 let NERDTreeIgnore=['\~$', '\.pyc$', '\.swp$']
 let NERDTreeShowBookmarks=1
 let NERDTreeWinPos = "right"
+let g:NERDTreeDirArrowExpandable = '+'
+let g:NERDTreeDirArrowCollapsible = '-'
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 nmap <F7> :NERDTreeToggle<cr>
