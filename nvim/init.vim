@@ -5,6 +5,7 @@ Plug 'Shougo/neco-vim', { 'do': ':UpdateRemotePlugins' }
 Plug 'deoplete-plugins/deoplete-go', { 'do': ':UpdateRemotePlugins' }
 Plug 'racer-rust/vim-racer', { 'do': ':UpdateRemotePlugins' }
 Plug 'sickill/vim-monokai', { 'do': ':UpdateRemotePlugins' }
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 
 call plug#end()
 
