@@ -107,3 +107,12 @@ let g:NERDTreeDirArrowExpandable = '+'
 let g:NERDTreeDirArrowCollapsible = '-'
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 nmap <F7> :NERDTreeToggle<cr>
+
+
+" rust
+" need RUST_SRC_PATH environment
+" export RUST_SRC_PATH=$(rustc --print sysroot)/lib/rustlib/src/rust/src
+augroup Racer
+    autocmd!
+    autocmd FileType rust nmap <buffer> gd         <Plug>(rust-def)
+augroup END
