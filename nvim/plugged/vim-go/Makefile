@@ -1,4 +1,4 @@
-VIMS ?= vim-8.0 vim-8.2 nvim
+VIMS ?= vim-8.0 nvim
 
 all: install lint test
 
@@ -6,7 +6,6 @@ install:
 	@echo "==> Installing Vims: $(VIMS)"
 	@for vim in $(VIMS); do \
 		./scripts/install-vim $$vim; \
-		./scripts/install-tools $$vim; \
 	done
 
 test:
@@ -17,7 +16,7 @@ test:
 
 lint:
 	@echo "==> Running linting tools"
-	@./scripts/lint vim-8.2
+	@./scripts/lint vim-8.0
 
 docker:
 	@echo "==> Building/starting Docker container"

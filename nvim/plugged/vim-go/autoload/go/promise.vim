@@ -19,18 +19,13 @@ function! go#promise#New(fn, timeout, default) abort
   " explicitly bind to state so that within l:promise's methods, self will
   " always refer to state. See :help Partial for more information.
   return {
-        \ 'wrapper': function('s:wrapper', [a:fn, a:default], l:state),
+        \ 'wrapper': function('s:wrapper', [a:fn], l:state),
         \ 'await': function('s:await', [a:timeout, a:default], l:state),
   \ }
 endfunction
 
-function! s:wrapper(fn, default, ...) dict
-  try
-    let self.retval = call(a:fn, a:000)
-  catch
-    let self.retval = substitute(v:exception, '^Vim', '', '')
-    let self.exception = 1
-  endtry
+function! s:wrapper(fn, ...) dict
+  let self.retval = call(a:fn, a:000)
   return self.retval
 endfunction
 
@@ -41,9 +36,6 @@ function! s:await(timeout, default) dict
   endwhile
   call timer_stop(l:timer)
 
-  if get(self, 'exception', 0)
-    throw self.retval
-  endif
   return self.retval
 endfunction
 

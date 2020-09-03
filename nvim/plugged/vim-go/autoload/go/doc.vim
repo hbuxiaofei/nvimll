@@ -6,25 +6,40 @@
 let s:cpo_save = &cpo
 set cpo&vim
 
-scriptencoding utf-8
-
 let s:buf_nr = -1
 
 function! go#doc#OpenBrowser(...) abort
-  if len(a:000) == 0
-    let [l:out, l:err] = go#lsp#DocLink()
+  " check if we have gogetdoc as it gives us more and accurate information.
+  " Only supported if we have json_decode as it's not worth to parse the plain
+  " non-json output of gogetdoc
+  let bin_path = go#path#CheckBinPath('gogetdoc')
+  if !empty(bin_path) && exists('*json_decode')
+    let [l:json_out, l:err] = s:gogetdoc(1)
     if l:err
-      call go#util#EchoError(l:out)
+      call go#util#EchoError(json_out)
       return
     endif
 
-    if len(l:out) == 0
-      call go#util#EchoWarning("could not path for doc URL")
+    let out = json_decode(json_out)
+    if type(out) != type({})
+      call go#util#EchoError("gogetdoc output is malformed")
     endif
 
-    let l:godoc_url = printf('%s/%s', go#config#DocUrl(), l:out)
+    let import = out["import"]
+    let name = out["name"]
+    let decl = out["decl"]
 
-    call go#util#OpenBrowser(l:godoc_url)
+    let godoc_url = go#config#DocUrl()
+    let godoc_url .= "/" . import
+    if decl !~ '^package'
+      let anchor = name
+      if decl =~ '^func ('
+        let anchor = substitute(decl, '^func ([^ ]\+ \*\?\([^)]\+\)) ' . name . '(.*', '\1', '') . "." . name
+      endif
+      let godoc_url .= "#" . anchor
+    endif
+
+    call go#util#OpenBrowser(godoc_url)
     return
   endif
 
@@ -37,7 +52,7 @@ function! go#doc#OpenBrowser(...) abort
   let exported_name = pkgs[1]
 
   " example url: https://godoc.org/github.com/fatih/set#Set
-  let godoc_url = printf('%s/%s#%s', go#config#DocUrl(), pkg, exported_name)
+  let godoc_url = go#config#DocUrl() . "/" . pkg . "#" . exported_name
   call go#util#OpenBrowser(godoc_url)
 endfunction
 
@@ -45,8 +60,11 @@ function! go#doc#Open(newmode, mode, ...) abort
   " With argument: run "godoc [arg]".
   if len(a:000)
     let [l:out, l:err] = go#util#Exec(['go', 'doc'] + a:000)
-  else " Without argument: use gopls to get documentation
-    let [l:out, l:err] = go#lsp#Doc()
+  else " Without argument: run gogetdoc on cursor position.
+    let [l:out, l:err] = s:gogetdoc(0)
+    if out == -1
+      return
+    endif
   endif
 
   if l:err
@@ -54,7 +72,7 @@ function! go#doc#Open(newmode, mode, ...) abort
     return
   endif
 
-  call s:GodocView(a:newmode, a:mode, l:out)
+  call s:GodocView(a:newmode, a:mode, out)
 endfunction
 
 function! s:GodocView(newposition, position, content) abort
@@ -63,14 +81,10 @@ function! s:GodocView(newposition, position, content) abort
     if exists('*popup_atcursor') && exists('*popup_clear')
       call popup_clear()
 
-      let borderchars = ['-', '|', '-', '|', '+', '+', '+', '+']
-      if &encoding == "utf-8"
-        let borderchars = ['─', '│', '─', '│', '┌', '┐', '┘', '└']
-      endif
       call popup_atcursor(split(a:content, '\n'), {
             \ 'padding': [1, 1, 1, 1],
-            \ 'borderchars': borderchars,
-            \ 'border': [1, 1, 1, 1],
+            \ 'borderchars': ['-','|','-','|','+','+','+','+'],
+            \ "border": [1, 1, 1, 1],
             \ })
     elseif has('nvim') && exists('*nvim_open_win')
       let lines = split(a:content, '\n')
@@ -165,6 +179,23 @@ function! s:GodocView(newposition, position, content) abort
   " make sure any key that sends an escape as a prefix (e.g. the arrow keys)
   " don't cause the window to close.
   nnoremap <buffer> <silent> <Esc>[ <Esc>[
+endfunction
+
+function! s:gogetdoc(json) abort
+  let l:cmd = [
+        \ 'gogetdoc',
+        \ '-tags', go#config#BuildTags(),
+        \ '-pos', expand("%:p:gs!\\!/!") . ':#' . go#util#OffsetCursor()]
+  if a:json
+    let l:cmd += ['-json']
+  endif
+
+  if &modified
+    let l:cmd += ['-modified']
+    return go#util#Exec(l:cmd, go#util#archive())
+  endif
+
+  return go#util#Exec(l:cmd)
 endfunction
 
 " returns the package and exported name. exported name might be empty.

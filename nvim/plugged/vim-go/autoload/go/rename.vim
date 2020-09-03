@@ -20,7 +20,7 @@ function! go#rename#Rename(bang, ...) abort
     let to_identifier = a:1
   endif
 
-  let l:bin = go#config#RenameCommand()
+  let l:bin = go#config#GorenameCommand()
 
   " return with a warning if the bin doesn't exist
   let bin_path = go#path#CheckBinPath(l:bin)
@@ -42,7 +42,7 @@ function! go#rename#Rename(bang, ...) abort
     call go#util#EchoWarning('unexpected rename command')
   endif
 
-  let l:cmd = extend([l:bin_path], l:args)
+  let l:cmd = extend([l:bin], l:args)
 
   if go#util#has_job()
     call s:rename_job({
@@ -52,12 +52,7 @@ function! go#rename#Rename(bang, ...) abort
     return
   endif
 
-  let l:wd = go#util#ModuleRoot()
-  if l:wd == -1
-    let l:wd = expand("%:p:h")
-  endif
-
-  let [l:out, l:err] = go#util#ExecInWorkDir(l:cmd, l:wd)
+  let [l:out, l:err] = go#util#ExecInDir(l:cmd)
   call s:parse_errors(l:err, a:bang, split(l:out, '\n'))
 endfunction
 
@@ -71,11 +66,6 @@ function s:rename_job(args)
   " autowrite is not enabled for jobs
   call go#cmd#autowrite()
   let l:cbs = go#job#Options(l:job_opts)
-
-  let l:wd = go#util#ModuleRoot()
-  if l:wd != -1
-    let l:cbs.cwd = l:wd
-  endif
 
   " wrap l:cbs.exit_cb in s:exit_cb.
   let l:cbs.exit_cb = funcref('s:exit_cb', [l:cbs.exit_cb])

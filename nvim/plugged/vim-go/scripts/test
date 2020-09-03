@@ -14,22 +14,19 @@ _usage() {
   echo "  -h     Show this help"
   echo "  -v     Enable verbose output"
   echo "  -r     Run only the tests from this file"
-  echo "  -c     Generate code coverage reports"
-  echo "  -u     Submit code coverage reports"
+  echo "  -c     Generate and submit code coverage reports"
   echo
 }
 
 verbose=0
 run=""
 coverage=""
-uploadcoverage=""
-while getopts "hvcur:" option; do
+while getopts "hvcr:" option; do
   case "$option" in
       h) _usage; exit 0 ;;
       v) verbose=1; ;;
       r) run=$OPTARG ;;
       c) coverage="-c" ;;
-      u) uploadcoverage=1 ;;
       *)
         echo "error: unknown option '$option'"
         _usage
@@ -72,7 +69,6 @@ find "$vimgodir" -name '*_test.vim' | while read test_file; do
   "$vimgodir/scripts/run-vim" $coverage $vim -e \
     +"silent e $test_file" \
     +"let g:test_verbose=$verbose" \
-    +"let g:go_echo_command_info=0" \
     -S ./scripts/runtest.vim < /dev/null || (
       # If Vim exits with non-0 it's almost certainly a bug in the test runner;
       # should very rarely happen in normal usage.
@@ -94,15 +90,12 @@ if [ -f "/tmp/vim-go-test/FAILED" ]; then
 fi
 echo 2>&1 "All ($vim) tests PASSED"
 
-# Generate coverage reports
+# Submit coverage reports
 if [ -n "$coverage" ]; then
   coverage xml --omit '*_test.vim'
-
-  if [ -n "$uploadcoverage" ]; then
-    codecov -X search gcov pycov -f coverage.xml --required \
+  codecov -X search gcov pycov -f coverage.xml --required \
     --flags "$(echo "$vim" | sed -s 's/[-.]//g')"
-    rm coverage.xml
-  fi
+  rm coverage.xml
 fi
 
 # vim:ts=2:sts=2:sw=2:et
