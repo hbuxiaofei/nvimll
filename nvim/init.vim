@@ -6,6 +6,7 @@ Plug 'Shougo/neco-vim', { 'do': ':UpdateRemotePlugins' }
 Plug 'sickill/vim-monokai', { 'do': ':UpdateRemotePlugins' }
 Plug 'vim-airline/vim-airline', { 'do': ':UpdateRemotePlugins' }
 Plug 'majutsushi/tagbar', { 'do': ':UpdateRemotePlugins' }
+Plug 'lfv89/vim-interestingwords', { 'do': ':UpdateRemotePlugins' }
 
 Plug 'racer-rust/vim-racer', { 'do': ':UpdateRemotePlugins' }
 
@@ -48,6 +49,22 @@ set laststatus=2
 
 set encoding=utf-8
 set fileencoding=utf-8
+
+" remove unwanted whitespace
+" https://github.com/spf13/spf13-vim.git
+function! StripTrailingWhitespace()
+        " Preparation: save last search, and cursor position.
+        let _s=@/
+        let l = line(".")
+        let c = col(".")
+        " do the business:
+        %s/\s\+$//e
+        " clean up: restore previous search history, and cursor position
+        let @/=_s
+        call cursor(l, c)
+endfunction
+autocmd BufWritePre * call StripTrailingWhitespace()
+autocmd BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|else|exe "norm $"|endif|endif
 
 
 " enable deoplete
