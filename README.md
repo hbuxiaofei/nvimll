@@ -32,3 +32,8 @@ See `:help deoplete-options` for a complete list of options.
 ```shell
 # go get github.com/nsf/gocode
 ```
+
+- Python
+```shell
+# pip3 install jedi
+```
