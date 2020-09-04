@@ -21,7 +21,7 @@ See `:help deoplete-options` for a complete list of options.
 ```
 
 
-## Language Setting
+## Language Requirements
 
 - Rust
 ```shell
@@ -37,3 +37,6 @@ See `:help deoplete-options` for a complete list of options.
 ```shell
 # pip3 install jedi
 ```
+
+- C/C++
+`clang` command
