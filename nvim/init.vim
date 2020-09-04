@@ -12,6 +12,7 @@ Plug 'preservim/nerdtree', { 'do': ':UpdateRemotePlugins' }
 Plug 'lfv89/vim-interestingwords', { 'do': ':UpdateRemotePlugins' }
 Plug 'jiangmiao/auto-pairs', { 'do': ':UpdateRemotePlugins' }
 Plug 'kien/ctrlp.vim', { 'do': ':UpdateRemotePlugins' }
+Plug 'skywind3000/asyncrun.vim', { 'do': ':UpdateRemotePlugins' }
 
 Plug 'racer-rust/vim-racer', { 'do': ':UpdateRemotePlugins' }
 
@@ -104,6 +105,8 @@ nmap <F7> :NERDTreeToggle<cr>
 nmap <silent> <leader><F6> :call LLvimLQlistToggle("Location List", 'l')<CR>
 nmap <silent> <F6> :call LLvimLQlistToggle("Quickfix List", 'c')<CR>
 
+" asyncrun
+let g:asyncrun_open=10
 
 " rust
 " need RUST_SRC_PATH environment
