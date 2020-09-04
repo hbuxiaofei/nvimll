@@ -19,6 +19,8 @@ Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 Plug 'deoplete-plugins/deoplete-jedi', { 'do': ':UpdateRemotePlugins' }
 Plug 'davidhalter/jedi-vim', { 'do': ':UpdateRemotePlugins' }
 
+Plug 'Shougo/deoplete-clangx', { 'do': ':UpdateRemotePlugins' }
+
 call plug#end()
 
 
