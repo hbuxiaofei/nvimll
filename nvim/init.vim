@@ -1,5 +1,7 @@
 call plug#begin('~/.config/nvim/plugged')
 
+Plug 'll/ll.vim', { 'do': ':UpdateRemotePlugins' }
+
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'Shougo/neco-vim', { 'do': ':UpdateRemotePlugins' }
 
@@ -56,21 +58,8 @@ set encoding=utf-8
 set fileencoding=utf-8
 
 " remove unwanted whitespace
-" https://github.com/spf13/spf13-vim.git
-function! StripTrailingWhitespace()
-        " Preparation: save last search, and cursor position.
-        let _s=@/
-        let l = line(".")
-        let c = col(".")
-        " do the business:
-        %s/\s\+$//e
-        " clean up: restore previous search history, and cursor position
-        let @/=_s
-        call cursor(l, c)
-endfunction
-autocmd BufWritePre * call StripTrailingWhitespace()
+autocmd BufWritePre * call LLvimStripTrailingWhitespace()
 autocmd BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|else|exe "norm $"|endif|endif
-
 
 " enable deoplete
 let g:deoplete#enable_at_startup = 1
@@ -109,6 +98,11 @@ let g:NERDTreeDirArrowExpandable = '+'
 let g:NERDTreeDirArrowCollapsible = '-'
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 nmap <F7> :NERDTreeToggle<cr>
+
+
+" quickfix
+nmap <silent> <leader><F6> :call LLvimLQlistToggle("Location List", 'l')<CR>
+nmap <silent> <F6> :call LLvimLQlistToggle("Quickfix List", 'c')<CR>
 
 
 " rust
