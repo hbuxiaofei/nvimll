@@ -14,6 +14,7 @@ Plug 'jiangmiao/auto-pairs', { 'do': ':UpdateRemotePlugins' }
 Plug 'kien/ctrlp.vim', { 'do': ':UpdateRemotePlugins' }
 Plug 'rayylee/asyncrun.vim', { 'do': ':UpdateRemotePlugins' }
 Plug 'preservim/nerdcommenter', { 'do': ':UpdateRemotePlugins' }
+Plug 'voldikss/vim-floaterm', { 'do': ':UpdateRemotePlugins' }
 
 Plug 'racer-rust/vim-racer', { 'do': ':UpdateRemotePlugins' }
 
@@ -100,6 +101,11 @@ let g:NERDTreeDirArrowExpandable = '+'
 let g:NERDTreeDirArrowCollapsible = '-'
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 nmap <F7> :NERDTreeToggle<cr>
+
+
+" floaterm
+nnoremap <silent> <F9> :FloatermToggle<CR>
+tnoremap <silent> <F9> <C-\><C-n>:FloatermToggle<CR>
 
 
 " quickfix
