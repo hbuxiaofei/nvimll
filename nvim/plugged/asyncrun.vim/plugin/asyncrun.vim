@@ -157,6 +157,9 @@ let g:asyncrun_text = get(g:, 'asyncrun_text', '')
 " enable local errorformat ?
 let g:asyncrun_local = get(g:, 'asyncrun_local', 1)
 
+" default raw setting
+let g:asyncrun_raw = get(g:, 'asyncrun_raw', 0)
+
 " name of autocmd in QuickFixCmdPre / QuickFixCmdPost
 let g:asyncrun_auto = get(g:, 'asyncrun_auto', '')
 
@@ -178,7 +181,7 @@ let g:asyncrun_silent = get(g:, 'asyncrun_silent', 1)
 " skip autocmds
 let g:asyncrun_skip = get(g:, 'asyncrun_skip', 0)
 
-" last args 
+" last args
 let g:asyncrun_info = get(g:, 'asyncrun_info', '')
 
 " 0: no save, 1: save current buffer, 2: save all modified buffers.
@@ -399,6 +402,9 @@ function! s:AsyncRun_Job_Update(count)
 		let &g:efm = s:async_info.errorformat
 	endif
 	let l:raw = (&efm == '')? 1 : 0
+	if g:asyncrun_raw != 0
+		let l:raw = 1
+	endif
 	if s:async_info.raw == 1
 		let l:raw = 1
 	endif
@@ -1329,7 +1335,7 @@ function! s:start_in_terminal(opts)
 		let rows = get(a:opts, 'rows', '')
 		let cols = get(a:opts, 'cols', '')
 		if pos == 'top'
-			exec "leftabove " . rows . "split"	
+			exec "leftabove " . rows . "split"
 		elseif pos == 'bottom' || pos == 'bot'
 			exec "rightbelow " . rows . "split"
 		elseif pos == 'left'
@@ -1340,7 +1346,7 @@ function! s:start_in_terminal(opts)
 			exec "rightbelow " . rows . "split"
 		endif
 	endif
-	if avail > 0 
+	if avail > 0
 		exec "normal! ". avail . "\<c-w>\<c-w>"
 	endif
 	let uid = win_getid()

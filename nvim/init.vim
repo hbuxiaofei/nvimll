@@ -12,7 +12,7 @@ Plug 'preservim/nerdtree', { 'do': ':UpdateRemotePlugins' }
 Plug 'lfv89/vim-interestingwords', { 'do': ':UpdateRemotePlugins' }
 Plug 'jiangmiao/auto-pairs', { 'do': ':UpdateRemotePlugins' }
 Plug 'kien/ctrlp.vim', { 'do': ':UpdateRemotePlugins' }
-Plug 'skywind3000/asyncrun.vim', { 'do': ':UpdateRemotePlugins' }
+Plug 'rayylee/asyncrun.vim', { 'do': ':UpdateRemotePlugins' }
 
 Plug 'racer-rust/vim-racer', { 'do': ':UpdateRemotePlugins' }
 
@@ -107,6 +107,7 @@ nmap <silent> <F6> :call LLvimLQlistToggle("Quickfix List", 'c')<CR>
 
 " asyncrun
 let g:asyncrun_open=10
+autocmd BufRead,BufNewFile *.go let g:asyncrun_raw = 1
 
 " rust
 " need RUST_SRC_PATH environment
