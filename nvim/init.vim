@@ -17,6 +17,8 @@ Plug 'preservim/nerdcommenter', { 'do': ':UpdateRemotePlugins' }
 Plug 'voldikss/vim-floaterm', { 'do': ':UpdateRemotePlugins' }
 
 Plug 'racer-rust/vim-racer', { 'do': ':UpdateRemotePlugins' }
+Plug 'rust-lang/rust.vim', { 'do': ':UpdateRemotePlugins' }
+Plug 'tbodt/deoplete-tabnine', { 'do': './install.sh' }
 
 Plug 'deoplete-plugins/deoplete-go', { 'do': ':UpdateRemotePlugins' }
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
@@ -70,8 +72,9 @@ let g:deoplete#enable_at_startup = 1
 " disable go version warning, this will happen when nvim version is too low
 let g:go_version_warning = 0
 
-" disable jedi-vim complete
-let g:jedi#completions_enabled = 0
+" jedi-vim
+let g:jedi#popup_on_dot = 0
+
 
 
 " airline
@@ -123,3 +126,10 @@ augroup Racer
     autocmd!
     autocmd FileType rust nmap <buffer> gd         <Plug>(rust-def)
 augroup END
+let g:rustfmt_autosave = 1
+
+
+" deoplete-tabnine
+" https://areweideyet.com
+" https://www.tabnine.com
+call deoplete#custom#var('tabnine', {'line_limit': 100, 'max_num_results': 5})
