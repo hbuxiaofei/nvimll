@@ -13,6 +13,7 @@ Plug 'lfv89/vim-interestingwords', { 'do': ':UpdateRemotePlugins' }
 Plug 'jiangmiao/auto-pairs', { 'do': ':UpdateRemotePlugins' }
 Plug 'kien/ctrlp.vim', { 'do': ':UpdateRemotePlugins' }
 Plug 'rayylee/asyncrun.vim', { 'do': ':UpdateRemotePlugins' }
+Plug 'preservim/nerdcommenter', { 'do': ':UpdateRemotePlugins' }
 
 Plug 'racer-rust/vim-racer', { 'do': ':UpdateRemotePlugins' }
 
