@@ -402,7 +402,7 @@ function! s:AsyncRun_Job_Update(count)
 		let &g:efm = s:async_info.errorformat
 	endif
 	let l:raw = (&efm == '')? 1 : 0
-	if g:asyncrun_raw != 0
+	if g:asyncrun_raw == 1 && s:errorformat_enable == 0
 		let l:raw = 1
 	endif
 	if s:async_info.raw == 1
@@ -630,6 +630,24 @@ endfunc
 " AsyncRun Interface
 "----------------------------------------------------------------------
 
+
+" change errorformat by args
+function! s:AsyncRun_Job_ChangeErrorformat(args)
+	let l:args = a:args
+	let s:errorformat_enable = 0
+	if len(l:args) < 3
+		return
+	endif
+
+	let l:program = split(l:args[2])[0]
+	if l:program == 'grep'
+		let s:errorformat_enable = 1
+		let s:async_efm = &grepformat
+		let s:async_info.errorformat = s:async_efm
+	endif
+endfunc
+
+
 " start background build
 function! s:AsyncRun_Job_Start(cmd)
 	let l:running = 0
@@ -713,6 +731,7 @@ function! s:AsyncRun_Job_Start(cmd)
 	let s:async_info.postsave = ''
 	let s:async_info.autosave = ''
 	let g:asyncrun_text = s:async_info.text
+	call s:AsyncRun_Job_ChangeErrorformat(l:args)
 	call s:AutoCmd('Pre')
 	if s:async_nvim == 0
 		let l:options = {}
