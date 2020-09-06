@@ -12,7 +12,7 @@ Plug 'preservim/nerdtree', { 'do': ':UpdateRemotePlugins' }
 Plug 'lfv89/vim-interestingwords', { 'do': ':UpdateRemotePlugins' }
 Plug 'jiangmiao/auto-pairs', { 'do': ':UpdateRemotePlugins' }
 Plug 'kien/ctrlp.vim', { 'do': ':UpdateRemotePlugins' }
-Plug 'rayylee/asyncrun.vim', { 'do': ':UpdateRemotePlugins' }
+Plug 'skywind3000/asyncrun.vim', { 'do': ':UpdateRemotePlugins' }
 Plug 'preservim/nerdcommenter', { 'do': ':UpdateRemotePlugins' }
 Plug 'voldikss/vim-floaterm', { 'do': ':UpdateRemotePlugins' }
 
@@ -106,6 +106,15 @@ autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isT
 nmap <F7> :NERDTreeToggle<cr>
 
 
+" ctrlp
+let g:ctrlp_working_path_mode = 'wa'
+let g:ctrlp_match_window = 'min:1,max:15,results:100'
+
+
+" nerdcommenter
+let g:NERDSpaceDelims = 1
+
+
 " floaterm
 nnoremap <silent> <F9> :FloatermToggle<CR>
 tnoremap <silent> <F9> <C-\><C-n>:FloatermToggle<CR>
@@ -132,4 +141,5 @@ let g:rustfmt_autosave = 1
 " deoplete-tabnine
 " https://areweideyet.com
 " https://www.tabnine.com
+" https://github.com/codota/TabNine
 call deoplete#custom#var('tabnine', {'line_limit': 100, 'max_num_results': 5})

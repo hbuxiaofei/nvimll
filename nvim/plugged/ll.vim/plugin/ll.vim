@@ -1,3 +1,11 @@
+" replace table with space
+function! LLvimReplaceTab()
+    if !&binary && &filetype != 'diff'
+        :%ret! 4
+    endif
+endfunction
+
+
 function! s:LQlistGetBuffers()
   redir =>bufs
   silent! ls!
