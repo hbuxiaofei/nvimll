@@ -1,9 +1,22 @@
 " replace table with space
+" No key mapped, usage :call LLvimReplaceTab()
 function! LLvimReplaceTab()
-    if !&binary && &filetype != 'diff'
-        :%ret! 4
-    endif
+  if !&binary && &filetype != 'diff'
+    :%ret! 4
+  endif
 endfunction
+
+
+" To force clearing the undo information
+" From MANUAL of undo
+function! LLvimWriteWithCleareUndo()
+  let s:old_undolevels = &undolevels
+  set undolevels=-1
+  exe "normal a \<BS>\<Esc>"
+  let &undolevels = s:old_undolevels
+  unlet s:old_undolevels
+endfunction
+com! -bar WW cal LLvimWriteWithCleareUndo()
 
 
 function! s:LQlistGetBuffers()
@@ -12,7 +25,6 @@ function! s:LQlistGetBuffers()
   redir END
   return bufs
 endfunction
-
 " Toggles the quickfix and location list.
 " ref https://vim.fandom.com/wiki/Toggle_to_open_or_close_the_quickfix_window
 function! LLvimLQlistToggle(bufname, pfx)
@@ -35,16 +47,17 @@ function! LLvimLQlistToggle(bufname, pfx)
   endif
 endfunction
 
+
 " remove unwanted whitespace
 " https://github.com/spf13/spf13-vim.git
 function! LLvimStripTrailingWhitespace()
-        " Preparation: save last search, and cursor position.
-        let _s=@/
-        let l = line(".")
-        let c = col(".")
-        " do the business:
-        %s/\s\+$//e
-        " clean up: restore previous search history, and cursor position
-        let @/=_s
-        call cursor(l, c)
+  " Preparation: save last search, and cursor position.
+  let _s=@/
+  let l = line(".")
+  let c = col(".")
+  " do the business:
+  %s/\s\+$//e
+  " clean up: restore previous search history, and cursor position
+  let @/=_s
+  call cursor(l, c)
 endfunction
