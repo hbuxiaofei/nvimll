@@ -9,13 +9,23 @@ neovim_url="https://github.com/neovim/neovim/releases/download/stable/${neovim_t
 
 download_neovim()
 {
-    if ! command -v wget >/dev/null 2>&1; then
-        echo -e "\033[33m- [Err] wget: command not found\033[0m"
-        exit 1
+    if [ -e "$neovim_tarball" ]; then
+        echo -e "\033[32m- [Info] $neovim_tarball has been exist\033[0m"
+        return 0
     fi
 
-    wget $neovim_url
-    if [ $? -ne 0 ]; then
+    if command -v mwget >/dev/null 2>&1; then
+        mwget -n 10 $neovim_url
+    else
+        if command -v wget >/dev/null 2>&1; then
+            wget $neovim_url
+        else
+            echo -e "\033[33m- [Err] wget: command not found\033[0m"
+            exit 1
+        fi
+    fi
+
+    if [ $? -ne 0 ] || [ ! -e "$neovim_tarball" ]; then
         echo -e "\033[33m- [Err] get stable neovim error\033[0m"
         exit 1
     fi
