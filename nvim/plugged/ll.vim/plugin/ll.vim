@@ -62,3 +62,26 @@ function! LLvimStripTrailingWhitespace()
   let @/=_s
   call cursor(l, c)
 endfunction
+
+
+let s:nerdtree_buffer_number = 0
+function! LLvimNERDTreeToggle()
+  exec "NERDTreeToggle"
+  if g:NERDTree.IsOpen()
+    let s:nerdtree_buffer_number = buffer_number()
+  else
+    let s:nerdtree_buffer_number = 0
+  endif
+endfunction
+
+
+function! LLvimAirlineBufferClose()
+  let l:buffer_cur_number = buffer_number()
+  if g:NERDTree.IsOpen()
+    if l:buffer_cur_number == s:nerdtree_buffer_number
+      return
+    endif
+  endif
+  exe "bn"
+  exe "bd " . l:buffer_cur_number
+endfunction
