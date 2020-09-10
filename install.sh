@@ -27,7 +27,7 @@ install_ripgrep()
     fi
 
     echo -e "\033[32m- [Info] Install rg to ${bindir}\033[0m"
-    tar -xvf ./tools/${filetarball} \
+    tar -xf ./tools/${filetarball} \
         --strip-components 1 \
         --directory=${bindir} \
         ${filename}/${exename}
