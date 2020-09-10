@@ -15,6 +15,8 @@ Plug 'kien/ctrlp.vim', { 'do': ':UpdateRemotePlugins' }
 Plug 'skywind3000/asyncrun.vim', { 'do': ':UpdateRemotePlugins' }
 Plug 'preservim/nerdcommenter', { 'do': ':UpdateRemotePlugins' }
 Plug 'voldikss/vim-floaterm', { 'do': ':UpdateRemotePlugins' }
+Plug 'Yggdroot/LeaderF', { 'do': ':UpdateRemotePlugins' }
+Plug 'Yggdroot/LeaderF-marks', { 'do': ':UpdateRemotePlugins' }
 
 Plug 'racer-rust/vim-racer', { 'do': ':UpdateRemotePlugins' }
 Plug 'rust-lang/rust.vim', { 'do': ':UpdateRemotePlugins' }
@@ -82,7 +84,7 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#buffer_nr_show = 1
 nmap <leader>- <Plug>AirlineSelectPrevTab
 nmap <leader>= <Plug>AirlineSelectNextTab
-nmap <silent> <leader>q :call LLvimAirlineBufferClose()<CR>
+nmap <silent> <leader>+ :call LLvimAirlineBufferClose()<CR>
 
 
 " tagbar
@@ -109,6 +111,17 @@ nmap <silent> <F7> :call LLvimNERDTreeToggle()<CR>
 " ctrlp
 let g:ctrlp_working_path_mode = 'wa'
 let g:ctrlp_match_window = 'min:1,max:15,results:100'
+
+" leaderf
+let g:Lf_WindowPosition = 'popup'
+let g:Lf_PreviewInPopup = 1
+let g:Lf_PreviewResult = {'Rg':1 , 'Line': 1, 'Colorscheme': 1}
+let g:Lf_PopupPreviewPosition = 'bottom'
+noremap <Leader>fa :<C-U><C-R>=printf("Leaderf rg -e %s", expand("<cword>"))<CR>
+noremap <Leader>fr :<C-U><C-R>=printf("Leaderf rg --all-buffers -e %s", expand("<cword>"))<CR>
+noremap <leader>fl :<C-U><C-R>=printf("LeaderfLine")<CR><CR>
+noremap <leader>fm :<C-U><C-R>=printf("LeaderfMarks")<CR><CR>
+noremap <leader>fc :<C-U><C-R>=printf("LeaderfColorscheme")<CR><CR>
 
 
 " nerdcommenter
