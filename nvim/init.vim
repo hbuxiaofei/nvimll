@@ -113,6 +113,7 @@ let g:ctrlp_working_path_mode = 'wa'
 let g:ctrlp_match_window = 'min:1,max:15,results:100'
 
 " leaderf
+let g:Lf_CommandMap = {'<C-K>': ['<Up>'], '<C-J>': ['<Down>']}
 let g:Lf_WindowPosition = 'popup'
 let g:Lf_PreviewInPopup = 1
 let g:Lf_PreviewResult = {'Rg':1 , 'Line': 1, 'Colorscheme': 1}
@@ -120,8 +121,6 @@ let g:Lf_PopupPreviewPosition = 'bottom'
 noremap <Leader>fa :<C-U><C-R>=printf("Leaderf rg -e %s", expand("<cword>"))<CR>
 noremap <Leader>fr :<C-U><C-R>=printf("Leaderf rg --all-buffers -e %s", expand("<cword>"))<CR>
 noremap <leader>fl :<C-U><C-R>=printf("LeaderfLine")<CR><CR>
-noremap <leader>fm :<C-U><C-R>=printf("LeaderfMarks")<CR><CR>
-noremap <leader>fc :<C-U><C-R>=printf("LeaderfColorscheme")<CR><CR>
 
 
 " nerdcommenter
