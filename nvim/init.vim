@@ -118,6 +118,7 @@ let g:Lf_WindowPosition = 'popup'
 let g:Lf_PreviewInPopup = 1
 let g:Lf_PreviewResult = {'Rg':1 , 'Line': 1, 'Colorscheme': 1}
 let g:Lf_PopupPreviewPosition = 'bottom'
+let g:Lf_ShortcutF = "<leader>ff"
 noremap <Leader>fa :<C-U><C-R>=printf("Leaderf rg -e %s", expand("<cword>"))<CR>
 noremap <Leader>fr :<C-U><C-R>=printf("Leaderf rg --all-buffers -e %s", expand("<cword>"))<CR>
 noremap <leader>fl :<C-U><C-R>=printf("LeaderfLine")<CR><CR>
