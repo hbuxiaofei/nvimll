@@ -17,6 +17,9 @@ Plug 'preservim/nerdcommenter', { 'do': ':UpdateRemotePlugins' }
 Plug 'voldikss/vim-floaterm', { 'do': ':UpdateRemotePlugins' }
 Plug 'Yggdroot/LeaderF', { 'do': ':UpdateRemotePlugins' }
 Plug 'Yggdroot/LeaderF-marks', { 'do': ':UpdateRemotePlugins' }
+Plug 'SirVer/ultisnips', { 'do': ':UpdateRemotePlugins' }
+Plug 'honza/vim-snippets', { 'do': ':UpdateRemotePlugins' }
+Plug 'terryma/vim-multiple-cursors', { 'do': ':UpdateRemotePlugins' }
 
 Plug 'racer-rust/vim-racer', { 'do': ':UpdateRemotePlugins' }
 Plug 'rust-lang/rust.vim', { 'do': ':UpdateRemotePlugins' }
@@ -133,6 +136,32 @@ let g:floaterm_width = 0.8
 let g:floaterm_height = 0.8
 nnoremap <silent> <F9> :FloatermToggle<CR>
 tnoremap <silent> <F9> <C-\><C-n>:FloatermToggle<CR>
+
+
+" ultisnips
+let g:UltiSnipsJumpForwardTrigger="<c-b>"
+
+
+" vim-multiple-cursors
+func! Multiple_cursors_before()
+  if exists('g:AutoPairsLoaded')
+    call AutoPairsToggle()
+  end
+  if deoplete#is_enabled()
+    call deoplete#disable()
+    let g:deoplete_is_enable_before_multi_cursors = 1
+  else
+    let g:deoplete_is_enable_before_multi_cursors = 0
+  endif
+endfunc
+func! Multiple_cursors_after()
+  if exists('g:AutoPairsLoaded')
+    call AutoPairsToggle()
+  end
+  if g:deoplete_is_enable_before_multi_cursors
+    call deoplete#enable()
+  endif
+endfunc
 
 
 " quickfix
