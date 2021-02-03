@@ -21,6 +21,7 @@ Plug 'SirVer/ultisnips', { 'do': ':UpdateRemotePlugins' }
 Plug 'honza/vim-snippets', { 'do': ':UpdateRemotePlugins' }
 Plug 'terryma/vim-multiple-cursors', { 'do': ':UpdateRemotePlugins' }
 Plug 'tpope/vim-fugitive', { 'do': ':UpdateRemotePlugins' }
+Plug 'junegunn/gv.vim', { 'do': ':UpdateRemotePlugins' }
 
 Plug 'racer-rust/vim-racer', { 'do': ':UpdateRemotePlugins' }
 Plug 'rust-lang/rust.vim', { 'do': ':UpdateRemotePlugins' }
@@ -169,6 +170,8 @@ endfunc
 " quickfix
 nmap <silent> <leader><F6> :call LLvimLQlistToggle("Location List", 'l')<CR>
 nmap <silent> <F6> :call LLvimLQlistToggle("Quickfix List", 'c')<CR>
+nmap <silent> <F3> :cp<cr>
+nmap <silent> <F4> :cn<cr>
 
 " asyncrun
 let g:asyncrun_open=10
