@@ -169,6 +169,8 @@ endfunc
 " quickfix
 nmap <silent> <leader><F6> :call LLvimLQlistToggle("Location List", 'l')<CR>
 nmap <silent> <F6> :call LLvimLQlistToggle("Quickfix List", 'c')<CR>
+nmap <silent> <F3> :cp<cr>
+nmap <silent> <F4> :cn<cr>
 
 " asyncrun
 let g:asyncrun_open=10
