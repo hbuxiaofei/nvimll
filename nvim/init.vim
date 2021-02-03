@@ -21,6 +21,7 @@ Plug 'SirVer/ultisnips', { 'do': ':UpdateRemotePlugins' }
 Plug 'honza/vim-snippets', { 'do': ':UpdateRemotePlugins' }
 Plug 'terryma/vim-multiple-cursors', { 'do': ':UpdateRemotePlugins' }
 Plug 'tpope/vim-fugitive', { 'do': ':UpdateRemotePlugins' }
+Plug 'junegunn/gv.vim', { 'do': ':UpdateRemotePlugins' }
 
 Plug 'racer-rust/vim-racer', { 'do': ':UpdateRemotePlugins' }
 Plug 'rust-lang/rust.vim', { 'do': ':UpdateRemotePlugins' }
