@@ -10,7 +10,7 @@ Plug 'vim-airline/vim-airline', { 'do': ':UpdateRemotePlugins' }
 Plug 'majutsushi/tagbar', { 'do': ':UpdateRemotePlugins' }
 Plug 'preservim/nerdtree', { 'do': ':UpdateRemotePlugins' }
 Plug 'lfv89/vim-interestingwords', { 'do': ':UpdateRemotePlugins' }
-Plug 'jiangmiao/auto-pairs', { 'do': ':UpdateRemotePlugins' }
+" Plug 'jiangmiao/auto-pairs', { 'do': ':UpdateRemotePlugins' }
 Plug 'kien/ctrlp.vim', { 'do': ':UpdateRemotePlugins' }
 Plug 'skywind3000/asyncrun.vim', { 'do': ':UpdateRemotePlugins' }
 Plug 'preservim/nerdcommenter', { 'do': ':UpdateRemotePlugins' }
