@@ -178,8 +178,11 @@ let g:asyncrun_open=10
 autocmd BufRead,BufNewFile *.go let g:asyncrun_raw = 1
 
 " rust
-" it may need to set RUST_SRC_PATH environment
-" export RUST_SRC_PATH=$(rustc --print sysroot)/lib/rustlib/src/rust/src
+" This may need to:
+" - install rust-src
+"   rustup component add rust-src
+" - set RUST_SRC_PATH environment (not necessary sometimes)
+"   export RUST_SRC_PATH=$(rustc --print sysroot)/lib/rustlib/src/rust/src
 augroup Racer
     autocmd!
     autocmd FileType rust nmap <buffer> gd         <Plug>(rust-def)
