@@ -80,6 +80,11 @@ let g:deoplete#enable_at_startup = 1
 " disable go version warning, this will happen when nvim version is too low
 let g:go_version_warning = 0
 
+" vim-go
+let g:go_list_type = "quickfix"
+let g:go_list_height = 10
+autocmd FileType go nmap <C-[> <Plug>(go-implements)
+
 " jedi-vim
 let g:jedi#popup_on_dot = 0
 
