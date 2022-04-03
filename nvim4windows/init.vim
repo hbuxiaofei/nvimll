@@ -42,6 +42,7 @@ Plug 'romainl/vim-qf'
 Plug 'lfv89/vim-interestingwords'
 Plug 'tpope/vim-fugitive'
 Plug 'mhinz/vim-signify'
+Plug 'dense-analysis/ale'
 
 call plug#end()
 
@@ -136,3 +137,13 @@ function! StripTrailingWhitespace()
 endfunction
 autocmd BufWritePre * call StripTrailingWhitespace()
 
+" ale
+" rust-analyzer binary is required by ale
+" https://github.com/rust-analyzer/rust-analyzer
+let g:ale_set_highlights = 0
+let g:ale_lint_on_enter = 0
+au! BufNewFile,BufRead *.rs |
+    let g:ale_linters = {'rust': ['analyzer']} |
+    let g:ale_completion_enabled = 1 |
+    map <C-]> :ALEGoToDefinition<CR> |
+    set completeopt=menu
