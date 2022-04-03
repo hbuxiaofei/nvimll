@@ -19,14 +19,15 @@ filetype plugin on
 syntax enable      " 语法高亮
 syntax on
 
-" set t_Co=256
-set termguicolors  " 开启24bit的颜色，开启这个颜色会更漂亮一些
+set t_Co=256
 colorscheme desert " 设置主题
+set termguicolors  " 开启24bit的颜色，开启这个颜色会更漂亮一些
 
 set nobackup       " 取消备份
 set noswapfile
 set mouse=a        " 启用鼠标
 set colorcolumn=80
+highlight ColorColumn guibg=Gray
 
 call plug#begin('~/.config/nvim/plugged')
 Plug 'vim-airline/vim-airline'
@@ -46,8 +47,7 @@ Plug 'airblade/vim-gitgutter'
 call plug#end()
 
 let g:NERDTreeWinPos = "right"
-let NERDTreeWinSize=20
-let NERDTreeChDirMode=2
+let NERDTreeWinSize=25
 map <F7> :NERDTreeToggle<CR>
 
 " Automatically open a NERDTree if no files where specified
