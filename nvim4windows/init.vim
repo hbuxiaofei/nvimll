@@ -118,3 +118,5 @@ function! StripTrailingWhitespace()
 endfunction
 autocmd BufWritePre * call StripTrailingWhitespace()
 
+" interestingwords
+let g:interestingWordsGUIColors = ['#00FF00','#FFFF00','#FF0000','#A020F0','#0000FF','#00FF7F','#BDB76B','#FFC1C1','#EE1289','#C0FF3E']
