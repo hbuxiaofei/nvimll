@@ -19,47 +19,47 @@ filetype plugin on
 syntax enable      " 语法高亮
 syntax on
 
-set t_Co=256
-colorscheme desert " 设置主题
-set termguicolors  " 开启24bit的颜色，开启这个颜色会更漂亮一些
-
 set nobackup       " 取消备份
 set noswapfile
 set mouse=a        " 启用鼠标
 set colorcolumn=80
-highlight ColorColumn guibg=Gray
+
+set t_Co=256
+set termguicolors   " 开启24bit的颜色，开启这个颜色会更漂亮一些
+
 
 call plug#begin('~/.config/nvim/plugged')
 Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
+Plug 'preservim/tagbar'
 Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
 Plug 'preservim/nerdcommenter'
-Plug 'kien/ctrlp.vim'
-Plug 'preservim/tagbar'
+Plug 'flazz/vim-colorschemes'
 Plug 'voldikss/vim-floaterm', { 'do': ':UpdateRemotePlugins' }
-Plug 'justinmk/vim-syntax-extra'
+Plug 'kien/ctrlp.vim'
 Plug 'octol/vim-cpp-enhanced-highlight'
 Plug 'hbuxiaofei/cscope_maps'
 Plug 'romainl/vim-qf'
 Plug 'lfv89/vim-interestingwords'
 Plug 'tpope/vim-fugitive'
-Plug 'airblade/vim-gitgutter'
+Plug 'mhinz/vim-signify'
+
 call plug#end()
 
+
+" vim-colorschemes
+colorscheme molokai " 设置主题
+
+" nerdtree
 let g:NERDTreeWinPos = "right"
 let NERDTreeWinSize=25
 map <F7> :NERDTreeToggle<CR>
-
-" Automatically open a NERDTree if no files where specified
-autocmd vimenter * if !argc() | NERDTree
+autocmd vimenter * if !argc() | NERDTree " Automatically open a NERDTree if no files
 
 " nerdcommenter
 let g:NERDSpaceDelims = 1
 
+" ctrlp
 let g:ctrlp_map = '<c-p>'
-
-nmap <F5> :TagbarToggle<CR>
-let g:tagbar_left=1
 
 " floaterm
 let g:floaterm_width = 0.8
@@ -67,7 +67,7 @@ let g:floaterm_height = 0.8
 nnoremap <silent> <F9> :FloatermToggle<CR>
 tnoremap <silent> <F9> <C-\><C-n>:FloatermToggle<CR>
 
-let g:airline_theme='molokai'
+" airline
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#buffer_nr_show = 1
 nmap <leader>- <Plug>AirlineSelectPrevTab
@@ -76,6 +76,21 @@ nmap <Leader>+ :bd<cr>
 nmap <silent> <F3> :cp<cr>
 nmap <silent> <F4> :cn<cr>
 
+" tagbar
+let g:tagbar_left=1
+let g:tagbar_width=25
+let g:tagbar_sort = 0
+let g:tagbar_compact = 1
+nmap <F5> :TagbarToggle<CR>
+
+" vim-cpp-enhanced-highlight
+let g:cpp_posix_standard = 1
+
+" vim-qf(quickfix)
+nmap <F6> <Plug>(qf_qf_toggle)
+
+" interestingwords
+let g:interestingWordsGUIColors = ['#00FF00','#FFFF00','#FF0000','#A020F0','#0000FF','#00FF7F','#BDB76B','#FFC1C1','#EE1289','#C0FF3E']
 
 if ((filereadable("Kconfig"))&&(filereadable("Kbuild")))
     au! BufRead *.c,*.cpp |
@@ -85,6 +100,10 @@ if ((filereadable("Kconfig"))&&(filereadable("Kbuild")))
         set noexpandtab
 endif
 
+" vim-signify
+let g:signify_sign_delete = '-'
+
+" Showing the cscope results in a quick-fix list
 if has("cscope")
     set cscopequickfix=s-,c-,d-,i-,t-,e-,g-
 endif
@@ -99,11 +118,10 @@ function! LeeCtagsCscope()
 endfunction
 nmap <F8> :call LeeCtagsCscope()<cr>
 
-nmap <F6> <Plug>(qf_qf_toggle)
-
+" When editing a file, always jump to the last cursor position
 autocmd BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|else|exe "norm $"|endif|endif
 
-" remove unwanted whitespace
+" Remove unwanted whitespace
 " https://github.com/spf13/spf13-vim.git
 function! StripTrailingWhitespace()
     " Preparation: save last search, and cursor position.
@@ -118,5 +136,3 @@ function! StripTrailingWhitespace()
 endfunction
 autocmd BufWritePre * call StripTrailingWhitespace()
 
-" interestingwords
-let g:interestingWordsGUIColors = ['#00FF00','#FFFF00','#FF0000','#A020F0','#0000FF','#00FF7F','#BDB76B','#FFC1C1','#EE1289','#C0FF3E']
