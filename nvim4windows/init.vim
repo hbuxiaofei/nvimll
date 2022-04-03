@@ -8,7 +8,7 @@ set incsearch      " 边搜索边高亮
 set ignorecase     " 忽悠大小写
 " set cursorline   " 突出当前显示行
 
-set ts=4           " tab 占4个字符宽度 
+set ts=4           " tab 占4个字符宽度
 set softtabstop=4
 set shiftwidth=4
 set expandtab
@@ -26,7 +26,7 @@ colorscheme desert " 设置主题
 set nobackup       " 取消备份
 set noswapfile
 set mouse=a        " 启用鼠标
-set colorcolumn=80                                                            
+set colorcolumn=80
 
 call plug#begin('~/.config/nvim/plugged')
 Plug 'vim-airline/vim-airline'
@@ -51,7 +51,7 @@ let NERDTreeChDirMode=2
 map <F7> :NERDTreeToggle<CR>
 
 " Automatically open a NERDTree if no files where specified
-autocmd vimenter * if !argc() | NERDTree   
+autocmd vimenter * if !argc() | NERDTree
 
 " nerdcommenter
 let g:NERDSpaceDelims = 1
@@ -59,7 +59,7 @@ let g:NERDSpaceDelims = 1
 let g:ctrlp_map = '<c-p>'
 
 nmap <F5> :TagbarToggle<CR>
-let g:tagbar_left=1  
+let g:tagbar_left=1
 
 " floaterm
 let g:floaterm_width = 0.8
@@ -88,8 +88,6 @@ endif
 if has("cscope")
     set cscopequickfix=s-,c-,d-,i-,t-,e-,g-
 endif
-set nocst
-set csto=1
 
 function! LeeCtagsCscope()
     if $filetype == 'go'
