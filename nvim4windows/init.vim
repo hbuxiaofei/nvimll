@@ -1,11 +1,10 @@
-" set nocompatible " 关闭兼容模式
-" filetype off     " 关闭自动补全
-
 set number         " 打开行号设置
 set ruler          " 光标信息
 set hlsearch       " 高亮显示搜索
 set incsearch      " 边搜索边高亮
 set ignorecase     " 忽悠大小写
+set smartcase      " 有大写字母的搜索词,大小写敏感
+set nocompatible   " 不与vi兼容,采用vim自己的操作命令
 " set cursorline   " 突出当前显示行
 
 set ts=4           " tab 占4个字符宽度
@@ -20,9 +19,12 @@ syntax enable      " 语法高亮
 syntax on
 
 set nobackup       " 取消备份
-set noswapfile
+set noswapfile     " 不创建交换文件
 set mouse=a        " 启用鼠标
 set colorcolumn=80
+set scrolloff=5
+set sidescrolloff=15
+
 
 set t_Co=256
 set termguicolors   " 开启24bit的颜色，开启这个颜色会更漂亮一些
@@ -43,7 +45,6 @@ Plug 'lfv89/vim-interestingwords'
 Plug 'tpope/vim-fugitive'
 Plug 'mhinz/vim-signify'
 Plug 'dense-analysis/ale'
-
 call plug#end()
 
 
@@ -140,10 +141,12 @@ autocmd BufWritePre * call StripTrailingWhitespace()
 " ale
 " rust-analyzer binary is required by ale
 " https://github.com/rust-analyzer/rust-analyzer
-let g:ale_set_highlights = 0
-let g:ale_lint_on_enter = 0
-au! BufNewFile,BufRead *.rs |
-    let g:ale_linters = {'rust': ['analyzer']} |
-    let g:ale_completion_enabled = 1 |
-    map <C-]> :ALEGoToDefinition<CR> |
-    set completeopt=menu
+let g:ale_linters = {'rust': ['analyzer']}
+let g:ale_completion_enabled = 1
+let g:ale_sign_error = '✗'
+let g:ale_sign_warning = '⚡'
+function! AleRustSetting()
+    nnoremap <C-]> :ALEGoToDefinition<CR>
+    set completeopt=menu,menuone,noselect,noinsert
+endfunction
+autocmd FileType rust call AleRustSetting()
