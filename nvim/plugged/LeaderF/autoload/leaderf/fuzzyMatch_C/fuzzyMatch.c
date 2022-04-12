@@ -168,6 +168,11 @@ PatternContext* initPattern(const char* pattern, uint16_t pattern_len)
         fprintf(stderr, "Out of memory in initPattern()!\n");
         return NULL;
     }
+    pPattern_ctxt->actual_pattern_len = pattern_len;
+    if ( pattern_len >= 64 )
+    {
+        pattern_len = 63;
+    }
     pPattern_ctxt->pattern = pattern;
     pPattern_ctxt->pattern_len = pattern_len;
     memset(pPattern_ctxt->pattern_mask, -1, sizeof(pPattern_ctxt->pattern_mask));
@@ -533,8 +538,13 @@ ValueElements* evaluate(TextContext* pText_ctxt,
                         score = prefix_score + pVal->score - 0.3f * (pVal->beg - i);
                         end_pos = pVal->end;
                     }
+                    else
+                    {
+                        break;
+                    }
                 }
             }
+
             if ( score > max_score )
             {
                 max_score = score;
@@ -635,11 +645,6 @@ float getWeight(const char* text, uint16_t text_len,
     char first_char = pattern[0];
     char last_char = pattern[pattern_len - 1];
 
-    if ( pattern_len >= 64 )
-    {
-        return MIN_WEIGHT;
-    }
-
     /* maximum number of int16_t is (1 << 15) - 1 */
     if ( text_len >= (1 << 15) )
     {
@@ -687,9 +692,9 @@ float getWeight(const char* text, uint16_t text_len,
         }
     }
 
+    int16_t first_char_pos = -1;
     if ( pPattern_ctxt->is_lower )
     {
-        int16_t first_char_pos = -1;
         int16_t i;
         for ( i = 0; i < text_len; ++i )
         {
@@ -737,7 +742,6 @@ float getWeight(const char* text, uint16_t text_len,
     }
     else
     {
-        int16_t first_char_pos = -1;
         if ( isupper(first_char) )
         {
             int16_t i;
@@ -833,6 +837,31 @@ float getWeight(const char* text, uint16_t text_len,
     {
         free(text_mask);
         return MIN_WEIGHT;
+    }
+
+    if ( pPattern_ctxt->actual_pattern_len >= 64 )
+    {
+        int16_t i;
+        j = 0;
+        for ( i = first_char_pos; i < text_len; ++i )
+        {
+            if ( j < pPattern_ctxt->actual_pattern_len )
+            {
+                if ( (pPattern_ctxt->is_lower && tolower(text[i]) == pattern[j])
+                     || text[i] == pattern[j] )
+                {
+                    ++j;
+                }
+            }
+            else
+                break;
+        }
+
+        if ( j < pPattern_ctxt->actual_pattern_len )
+        {
+            free(text_mask);
+            return MIN_WEIGHT;
+        }
     }
 
     TextContext text_ctxt;
@@ -1243,6 +1272,10 @@ HighlightGroup* evaluateHighlights(TextContext* pText_ctxt,
                             cur_highlights.positions[0].len = n;
                             memcpy(cur_highlights.positions + 1, pGroup->positions, pGroup->end_index * sizeof(HighlightPos));
                             cur_highlights.end_index = pGroup->end_index + 1;
+                        }
+                        else
+                        {
+                            break;
                         }
                     }
                 }

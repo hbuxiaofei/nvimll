@@ -54,7 +54,7 @@ class SelfExplorer(Explorer):
         return "Self"
 
     def getStlCurDir(self):
-        return escQuote(lfEncode(os.getcwd()))
+        return escQuote(lfEncode(lfGetCwd()))
 
 
 #*****************************************************
@@ -77,8 +77,8 @@ class SelfExplManager(Manager):
         cmd = line.split(None, 2)[1]
         try:
             lfCmd(cmd)
-        except vim.error as e:
-            lfPrintError(e)
+        except vim.error:
+            lfPrintTraceback()
 
     def _getDigest(self, line, mode):
         """

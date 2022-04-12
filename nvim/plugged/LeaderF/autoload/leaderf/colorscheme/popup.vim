@@ -222,8 +222,10 @@ function! s:LoadFromPalette() abort
 endfunction
 
 function! leaderf#colorscheme#popup#load(category, name)
-    silent! call leaderf#colorscheme#popup#{a:name}#a_nonexistent_function()
-    call s:AddPropType()
+    exec 'runtime autoload/leaderf/colorscheme/popup/'.a:name.'.vim'
+    if !has("nvim")
+        call s:AddPropType()
+    endif
     call s:LoadFromPalette()
     call s:HighlightSeperator(a:category)
     call g:LfDefineDefaultColors()

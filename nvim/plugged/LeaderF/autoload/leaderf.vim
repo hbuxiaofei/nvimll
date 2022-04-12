@@ -124,7 +124,8 @@ call s:InitDict('g:Lf_PreviewResult', {
             \ 'BufTag': 1,
             \ 'Function': 1,
             \ 'Line': 0,
-            \ 'Colorscheme': 0
+            \ 'Colorscheme': 0,
+            \ 'Jumps': 1
             \})
 call s:InitDict('g:Lf_NormalMap', {})
 call s:InitVar('g:Lf_Extensions', {})
@@ -136,6 +137,7 @@ call s:InitDict('g:Lf_GtagsfilesCmd', {
             \ 'default': 'rg --no-messages --files'
             \})
 call s:InitVar('g:Lf_HistoryEditPromptIfEmpty', 1)
+call s:InitVar('g:Lf_PopupBorders', ['-','|','-','|','+','+','+','+'])
 
 let s:Lf_CommandMap = {
             \ '<C-A>':         ['<C-A>'],
@@ -352,22 +354,23 @@ endfunction
 " return the visually selected text and quote it with double quote
 function! leaderf#visual() abort
     try
-        let x_save = @x
+        let x_save = getreg("x", 1)
+        let type = getregtype("x")
         norm! gv"xy
         return '"' . escape(@x, '"') . '"'
     finally
-        let @x = x_save
+        call setreg("x", x_save, type)
     endtry
 endfunction
 
 function! leaderf#popupModePreviewFilter(winid, key) abort
     let key = get(g:Lf_KeyDict, get(g:Lf_KeyMap, a:key, a:key), a:key)
     if key ==? "<ESC>"
-        call popup_close(a:winid)
+        noautocmd call popup_close(a:winid)
         redraw
         return 0
     elseif key ==? "<CR>"
-        call popup_close(a:winid)
+        noautocmd call popup_close(a:winid)
         " https://github.com/vim/vim/issues/5216
         "redraw
         return 0
@@ -394,7 +397,7 @@ function! leaderf#popupModePreviewFilter(winid, key) abort
                 redraw
                 return 1
             else
-                call popup_close(a:winid)
+                noautocmd call popup_close(a:winid)
                 call win_execute(v:mouse_winid, "exec v:mouse_lnum")
                 call win_execute(v:mouse_winid, "exec 'norm!'.v:mouse_col.'|'")
                 redraw
@@ -416,11 +419,11 @@ endfunction
 function! leaderf#normalModePreviewFilter(id, winid, key) abort
     let key = get(g:Lf_KeyDict, get(g:Lf_KeyMap, a:key, a:key), a:key)
     if key ==? "<ESC>"
-        call popup_close(a:winid)
+        noautocmd call popup_close(a:winid)
         redraw
         return 1
     elseif key ==? "<CR>"
-        call popup_close(a:winid)
+        noautocmd call popup_close(a:winid)
         " https://github.com/vim/vim/issues/5216
         "redraw
         return 0
@@ -430,7 +433,7 @@ function! leaderf#normalModePreviewFilter(id, winid, key) abort
             call win_execute(pos.winid, "call cursor([pos.line, pos.column])")
             return 1
         else
-            call popup_close(a:winid)
+            noautocmd call popup_close(a:winid)
             redraw
             call win_execute(pos.winid, "call cursor([pos.line, pos.column])")
             exec g:Lf_py "import ctypes"
@@ -576,7 +579,7 @@ function! leaderf#PopupClosed(id_list, manager_id, winid, result) abort
         exec g:Lf_py printf("ctypes.cast(%d, ctypes.py_object).value.quit()", a:manager_id)
         for id in a:id_list
             if id != a:winid
-                call popup_close(id)
+                noautocmd call popup_close(id)
             endif
         endfor
     endif
@@ -605,8 +608,9 @@ function! leaderf#matchaddpos(group, pos) abort
     endfor
 endfunction
 
-function! leaderf#closeAllFloatwin(input_win_id, content_win_id, statusline_win_id, show_statusline) abort
+function! leaderf#closeAllFloatwin(input_win_id, content_win_id, statusline_win_id, show_statusline, id) abort
     if winbufnr(a:input_win_id) == -1
+        silent! call nvim_win_close(g:Lf_PreviewWindowID[a:id], 0)
         silent! call nvim_win_close(a:content_win_id, 0)
         if a:show_statusline
             silent! call nvim_win_close(a:statusline_win_id, 0)
@@ -615,6 +619,7 @@ function! leaderf#closeAllFloatwin(input_win_id, content_win_id, statusline_win_
             autocmd!
         augroup end
     elseif winbufnr(a:content_win_id) == -1
+        silent! call nvim_win_close(g:Lf_PreviewWindowID[a:id], 0)
         silent! call nvim_win_close(a:input_win_id, 0)
         if a:show_statusline
             silent! call nvim_win_close(a:statusline_win_id, 0)
@@ -623,6 +628,7 @@ function! leaderf#closeAllFloatwin(input_win_id, content_win_id, statusline_win_
             autocmd!
         augroup end
     elseif a:show_statusline && winbufnr(a:statusline_win_id) == -1
+        silent! call nvim_win_close(g:Lf_PreviewWindowID[a:id], 0)
         silent! call nvim_win_close(a:input_win_id, 0)
         silent! call nvim_win_close(a:content_win_id, 0)
         augroup Lf_Floatwin_Close

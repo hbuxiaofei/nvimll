@@ -380,8 +380,8 @@ g:Lf_PreviewCode                                *g:Lf_PreviewCode*
 
 g:Lf_DefaultExternalTool                        *g:Lf_DefaultExternalTool*
     Use this option to specify the default external tool which is used to
-    index the files. Possible values are 'rg', 'pt'(not available on Windows),
-    'ag'(not available on Windows), 'find'.  If you do not want to use the external tool: >
+    index the files. Possible values are 'rg', 'pt', 'ag', 'find'.
+    If you do not want to use the external tool: >
     let g:Lf_DefaultExternalTool = ""
 <
     By default, use the external tool in the sequence of 'rg', 'pt', 'ag', 'find'
@@ -547,7 +547,7 @@ g:Lf_HistoryNumber                              *g:Lf_HistoryNumber*
     Specify the number of records in history.
     Default value is 100.
 
-g:Lf_HistoryExclude                              *g:Lf_HistoryExclude*
+g:Lf_HistoryExclude                             *g:Lf_HistoryExclude*
     This option indicates that do not display the historires that matches the
     patterns defined in it.
 
@@ -570,6 +570,14 @@ g:Lf_HistoryEditPromptIfEmpty                   *g:Lf_HistoryEditPromptIfEmpty*
     If set to 1, when editing is started when there are 0 results, the text of
     the entered prompt is edited.
     Default value is 1.
+
+g:Lf_Rg                                         *g:Lf_Rg*
+    Use this option to specify the rg executable you use. If rg is not
+    in one of the directories in your $PATH environment variable, you should
+    set it by yourself. e.g., >
+    let g:Lf_Rg = 'C:\Windows\System32\rg.exe'
+<
+    Default value is "rg".
 
 g:Lf_RgConfig                                   *g:Lf_RgConfig*
     Specify a list of ripgrep configurations. For example, >
@@ -622,6 +630,13 @@ g:Lf_GtagsAutoGenerate                          *g:Lf_GtagsAutoGenerate*
     generated manually by using `Leaderf gtags --update` .
     Default value is 0.
 
+g:Lf_GtagsGutentags								*g:Lf_GtagsGutentags*
+	if you use https://github.com/ludovicchabant/vim-gutentags to generate
+		gtags; Firstly, you should let g:Lf_GtagsAutoGenerate = 0 and let  g:Lf_GtagsGutentags = 1.
+        Then, you should config gutentags like this: g:Lf_CacheDirectory =
+        expand('~') and g:gutentags_cache_dir = expand(g:Lf_CacheDirectory.'/.LfCache/gtags')
+	Default value is 0
+
 g:Lf_GtagsAutoUpdate                            *g:Lf_GtagsAutoUpdate*
     If the value is 1 and the gtags database already exists, gtags database
     will be updated automatically after the buffer is saved.
@@ -649,22 +664,22 @@ g:Lf_GtagsfilesCmd                              *g:Lf_GtagsfilesCmd*
     repository and `hg files` for hg repository, use `rg --no-messages --files`
     otherwise.
 
-g:Lf_GtagsAcceptDotfiles                          *g:Lf_GtagsAcceptDotfiles*
+g:Lf_GtagsAcceptDotfiles                        *g:Lf_GtagsAcceptDotfiles*
     This option tells gtags to accept files and directories whose names begin
     with a dot if the value is 1.
     Default value is 0.
 
-g:Lf_GtagsSkipUnreadable                          *g:Lf_GtagsSkipUnreadable*
+g:Lf_GtagsSkipUnreadable                        *g:Lf_GtagsSkipUnreadable*
     This option tells gtags to skip unreadable files if the value is 1.
     Default value is 0.
 
-g:Lf_GtagsSkipSymlink                             *g:Lf_GtagsSkipSymlink*
+g:Lf_GtagsSkipSymlink                           *g:Lf_GtagsSkipSymlink*
     This option tells gtags to skip symbolic links. If value is 'f' then skip
     only symbolic links for file, else if 'd' then skip only symbolic links
     for directory, else if value is 'a' then all symbolic links are skipped.
-    Default value is "".
+    Default value is "a".
 
-g:Lf_Gtagsconf                                    *g:Lf_Gtagsconf*
+g:Lf_Gtagsconf                                  *g:Lf_Gtagsconf*
     This option specifies the path of gtags configuration file('gtags.conf' or
     '.globalrc').
     Basically, you don't have to use this option, gtags has default values in
@@ -673,7 +688,7 @@ g:Lf_Gtagsconf                                    *g:Lf_Gtagsconf*
 
     Default value is "".
 
-g:Lf_Gtagslabel                                   *g:Lf_Gtagslabel*
+g:Lf_Gtagslabel                                 *g:Lf_Gtagslabel*
     This option specifies a label of the configuration file.
     By default, gtags supports C, C++, Yacc, Java, PHP and Assembly
     programming language. If you want to support other programming languages,
@@ -681,37 +696,42 @@ g:Lf_Gtagslabel                                   *g:Lf_Gtagslabel*
     set this option as "native-pygments".
     Default value is "default".
 
-g:Lf_GtagsStoreInProject                          *g:Lf_GtagsStoreInProject*
+g:Lf_GtagsStoreInProject                        *g:Lf_GtagsStoreInProject*
     This option specifies whether to store the gtags database files in the
     root directory of the project.
 
     Default value is 0.
 
-g:Lf_GtagsStoreInRootMarker                       *g:Lf_GtagsStoreInRootMarker*
+g:Lf_GtagsStoreInRootMarker                     *g:Lf_GtagsStoreInRootMarker*
     This option specifies whether to store the gtags database files in the
     root marker of the project.
 
     Default value is 0.
 
-g:Lf_EmptyQuery                                   *g:Lf_EmptyQuery*
+g:Lf_GtagsHigherThan6_6_2                       *g:Lf_GtagsHigherThan6_6_2*
+    If `gtag error! unrecognized option --skip-symlink` happens, set the value
+    to 0.
+    Default value is 1.
+
+g:Lf_EmptyQuery                                 *g:Lf_EmptyQuery*
     This option specifies whether to enable the empty query, i.e., if no
     pattern is input, sort the result according to the best match of current
     buffer's name.
 
     Default value is 1.
 
-g:Lf_IgnoreCurrentBufferName                      *g:Lf_IgnoreCurrentBufferName*
+g:Lf_IgnoreCurrentBufferName                    *g:Lf_IgnoreCurrentBufferName*
     This option specifies whether to remove the current buffer name from
     the result list.
 
     Default value is 0.
 
-g:Lf_PreviewInPopup                               *g:Lf_PreviewInPopup*
+g:Lf_PreviewInPopup                             *g:Lf_PreviewInPopup*
     This option specifies whether to preview the result in a popup window.
 
     Default value is 0.
 
-g:Lf_PreviewHorizontalPosition                    *g:Lf_PreviewHorizontalPosition*
+g:Lf_PreviewHorizontalPosition                  *g:Lf_PreviewHorizontalPosition*
     Specify where to locate the preview window horizontally. The value can be
     one of the following:
     'left': the preview window is on the left side of the screen.
@@ -719,21 +739,15 @@ g:Lf_PreviewHorizontalPosition                    *g:Lf_PreviewHorizontalPositio
     'right': the preview window is on the right side of the screen.
     'cursor': the preview window is at the cursor position.
 
-    Default value is 'cursor'.
+    Default value is 'right'.
 
-g:Lf_PreviewPopupWidth                            *g:Lf_PreviewPopupWidth*
+g:Lf_PreviewPopupWidth                          *g:Lf_PreviewPopupWidth*
     Specify the width of preview popup window, the value should be a non-negative
     integer. If the value is 0, the width is half of the screen's width.
 
     Default value is 0.
 
-g:Lf_DiscardEmptyBuffer                           *g:Lf_DiscardEmptyBuffer*
-    Specify whether to discard the first empty [No Name] buffer when opening
-    with <C-T>.
-
-    Default value is 0.
-
-g:Lf_PopupWidth                                   *g:Lf_PopupWidth*
+g:Lf_PopupWidth                                 *g:Lf_PopupWidth*
     Specify the width of the popup window or floating window when LeaderF is
     in popup mode. `Popup mode` is when |g:Lf_WindowPosition| is 'popup' or '--popup'
     is in the options list of `Leaderf` command.
@@ -746,11 +760,11 @@ g:Lf_PopupWidth                                   *g:Lf_PopupWidth*
     For example, set the width to 3/4 of the screen's width: >
     let g:Lf_PopupWidth = &columns * 3 / 4
     or
-    let g:Lf_PopupHeight = 0.75
+    let g:Lf_PopupWidth = 0.75
 <
     Default value is 0.
 
-g:Lf_PopupHeight                                   *g:Lf_PopupHeight*
+g:Lf_PopupHeight                                *g:Lf_PopupHeight*
     Specify the height of the popup window or floating window when LeaderF is
     in popup mode. `Popup mode` is when |g:Lf_WindowPosition| is 'popup' or '--popup'
     is in the options list of `Leaderf` command.
@@ -766,7 +780,7 @@ g:Lf_PopupHeight                                   *g:Lf_PopupHeight*
 <
     Default value is 0.
 
-g:Lf_PopupPosition                                 *g:Lf_PopupPosition*
+g:Lf_PopupPosition                              *g:Lf_PopupPosition*
     Specify the coordinate of the topleft corner of popup window or floating
     window when LeaderF is in popup mode. `Popup mode` is when |g:Lf_WindowPosition|
     is 'popup' or '--popup' is in the options list of `Leaderf` command.
@@ -779,26 +793,28 @@ g:Lf_PopupPosition                                 *g:Lf_PopupPosition*
 
     Default value is [0, 0].
 
-g:Lf_PopupShowStatusline                           *g:Lf_PopupShowStatusline*
+g:Lf_PopupShowStatusline                        *g:Lf_PopupShowStatusline*
     Specify whether to show the statusline when LeaderF is in popup mode.
     `Popup mode` is when |g:Lf_WindowPosition| is 'popup' or '--popup' is in the
     options list of `Leaderf` command.
 
     Default value is 1.
 
-g:Lf_PopupPreviewPosition                          *g:Lf_PopupPreviewPosition*
+g:Lf_PopupPreviewPosition                       *g:Lf_PopupPreviewPosition*
     Specify where to locate the preview window when LeaderF is in popup mode.
     `Popup mode` is when |g:Lf_WindowPosition| is 'popup' or '--popup' is in the
     options list of `Leaderf` command.
     The value can be one of the following:
     'top': the preview window is on the top of the main LeaderF window.
     'bottom': the preview window is at the bottom of the main LeaderF window.
+    'left': the preview window is on the left of the main LeaderF window.
+    'right': the preview window is on the right of the main LeaderF window.
     'cursor': the preview window is at the cursor position in the main LeaderF
               window.
 
     Default value is 'top'.
 
-g:Lf_PopupColorscheme                              *g:Lf_PopupColorscheme*
+g:Lf_PopupColorscheme                           *g:Lf_PopupColorscheme*
     You can configure the colorscheme of LeaderF in popup mode.
     e.g. >
     let g:Lf_PopupColorscheme = 'default'
@@ -811,7 +827,7 @@ g:Lf_PopupColorscheme                              *g:Lf_PopupColorscheme*
 
     Default value is 'default'.
 
-g:Lf_PopupPalette                                  *g:Lf_PopupPalette*
+g:Lf_PopupPalette                               *g:Lf_PopupPalette*
     This is a dictionary, you can customize the colorscheme of popup mode using
     it.
     Its structure is like below: >
@@ -847,6 +863,39 @@ g:Lf_PopupPalette                                  *g:Lf_PopupPalette*
 
     It is not defined by default.
 
+g:Lf_PopupShowFoldcolumn                        *g:Lf_PopupShowFoldcolumn*
+    Specifies whether to show the foldcolumn in popup window, value 1 means
+    showing foldcolumn, otherwise not.
+
+    Default value is 1.
+
+g:Lf_PopupAutoAjustHeight                       *g:Lf_PopupAutoAjustHeight*
+    Specifies whether to adjust the height of popup window automatically.
+
+    Default value is 1.
+
+g:Lf_PopupShowBorder                            *g:Lf_PopupShowBorder*
+    Specifies whether to show border for popup window.
+
+    Default value is 0.
+
+g:Lf_PopupBorders                               *g:Lf_PopupBorders*
+    Specifies a list of characters, defining the character to use for the
+    top/right/bottom/left border, followed by the character to use for the
+    topleft/topright/botright/botleft corner.
+    Example: >
+    let g:Lf_PopupBorders = ["─","│","─","│","╭","╮","╯","╰"]
+    let g:Lf_PopupBorders = ["─","│","─","│","┌","┐","┘","└"]
+    let g:Lf_PopupBorders = ["━","┃","━","┃","┏","┓","┛","┗"]
+    let g:Lf_PopupBorders = ["═","║","═","║","╔","╗","╝","╚"]
+<
+    For some terminals, the non-ascii characters can not be displayed
+    properly for borders, see https://github.com/neovim/neovim/issues/17996.
+    To have a good display for non-ascii characters, perhaps you need to set
+    the value of |ambiwidth| as "single".
+
+    Default value is ["-","|","-","|","+","+","+","+"].
+
 g:Lf_AutoResize                                 *g:Lf_AutoResize*
     Auto resize the LeaderF window height automatically.
 
@@ -863,7 +912,7 @@ g:Lf_ShowDevIcons                               *g:Lf_ShowDevIcons*
 
     Default value is 1.
 
-g:Lf_DevIconsFont                                 *g:Lf_DevIconsFont*
+g:Lf_DevIconsFont                               *g:Lf_DevIconsFont*
     Specifies the font used to display the icon.
     If it is empty, use the default font.
 

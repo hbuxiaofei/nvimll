@@ -63,12 +63,15 @@ class LfCli(object):
         self._spin_symbols = lfEval("get(g:, 'Lf_SpinSymbols', [])")
         if not self._spin_symbols:
             if platform.system() == "Linux":
-                self._spin_symbols = ['△', '▲', '▷', '▶', '▽', '▼', '◁', '◀']
+                self._spin_symbols = ['✵', '⋆', '✶','✷','✸','✹', '✺']
             else:
                 self._spin_symbols = ['🌘', '🌗', '🌖', '🌕', '🌔', '🌓', '🌒', '🌑']
 
     def setInstance(self, instance):
         self._instance = instance
+
+    def setArguments(self, arguments):
+        self._arguments = arguments
 
     def _setDefaultMode(self):
         mode = lfEval("g:Lf_DefaultMode")
@@ -202,6 +205,8 @@ class LfCli(object):
         input_window = self._instance.getPopupInstance().input_win
         content_winid = self._instance.getPopupInstance().content_win.id
         input_win_width = input_window.width
+        if lfEval("get(g:, 'Lf_PopupShowBorder', 0)") == '1' and lfEval("has('nvim')") == '0':
+            input_win_width -= 2
         if self._instance.getWinPos() == 'popup':
             lfCmd("""call win_execute(%d, 'let line_num = line(".")')""" % content_winid)
             line_num = lfEval("line_num")
@@ -238,7 +243,7 @@ class LfCli(object):
                                                                                sep,
                                                                                part3,
                                                                                sep_width=len(sep),
-                                                                               part1_width=part1_width,
+                                                                               part1_width=max(0, part1_width),
                                                                                part2_width=len(part2),
                                                                                part3_width=len(part3))
         if self._instance.getWinPos() == 'popup':
@@ -320,7 +325,7 @@ class LfCli(object):
 
     def buildPopupPrompt(self):
         self._buildPopupPrompt()
-        lfCmd("redraw")
+        lfCmd("silent! redraw")
 
     def _buildPrompt(self):
         if lfEval("has('nvim')") == '1' and self._instance.getWinPos() != 'floatwin':
@@ -330,6 +335,7 @@ class LfCli(object):
         if self._idle and datetime.now() - self._start_time < timedelta(milliseconds=500): # 500ms
             return
         else:
+            self._start_time = datetime.now()
             if self._blinkon:
                 if self._instance.getWinPos() in ('popup', 'floatwin'):
                     lfCmd("hi! default link Lf_hl_cursor Lf_hl_popup_cursor")
@@ -339,9 +345,9 @@ class LfCli(object):
                 lfCmd("hi! default link Lf_hl_cursor NONE")
 
             if lfEval("g:Lf_CursorBlink") == '1':
-                self._start_time = datetime.now()
                 self._blinkon = not self._blinkon
             elif self._idle:
+                lfCmd("silent! redraw")
                 return
 
         if self._instance.getWinPos() in ('popup', 'floatwin'):
@@ -368,11 +374,17 @@ class LfCli(object):
         lfCmd("redraw")
 
     def _buildPattern(self):
+        case_insensitive = "--case-insensitive" in self._arguments
         if self._is_fuzzy:
             if self._and_delimiter in ''.join(self._cmdline).lstrip(self._and_delimiter) \
                     and self._delimiter not in self._cmdline:
                 self._is_and_mode = True
-                patterns = re.split(r'['+self._and_delimiter+']+', ''.join(self._cmdline).strip(self._and_delimiter))
+                if case_insensitive:
+                    patterns = re.split(r'['+self._and_delimiter+']+',
+                                        ''.join(self._cmdline).strip(self._and_delimiter).lower())
+                else:
+                    patterns = re.split(r'['+self._and_delimiter+']+',
+                                        ''.join(self._cmdline).strip(self._and_delimiter))
                 pattern_dict = OrderedDict([])
                 for p in patterns:
                     if p in pattern_dict:
@@ -390,13 +402,20 @@ class LfCli(object):
                         self._supports_refine) and self._delimiter in self._cmdline):
                     self._refine = True
                     idx = self._cmdline.index(self._delimiter)
-                    self._pattern = (''.join(self._cmdline[:idx]),
-                                     ''.join(self._cmdline[idx+1:]))
+                    if case_insensitive:
+                        self._pattern = (''.join(self._cmdline[:idx]).lower(),
+                                         ''.join(self._cmdline[idx+1:]).lower())
+                    else:
+                        self._pattern = (''.join(self._cmdline[:idx]),
+                                         ''.join(self._cmdline[idx+1:]))
                     if self._pattern == ('', ''):
                         self._pattern = None
                 else:
                     self._refine = False
-                    self._pattern = ''.join(self._cmdline)
+                    if case_insensitive:
+                        self._pattern = ''.join(self._cmdline).lower()
+                    else:
+                        self._pattern = ''.join(self._cmdline)
         else:
             self._is_and_mode = False
             self._pattern = ''.join(self._cmdline)
@@ -639,18 +658,16 @@ class LfCli(object):
         try:
             self._history_index = 0
             self._blinkon = True
-            idle = 10000
+            start = time.time()
             update = False
-
-            if len(self._instance._manager._content) < 100000:
-                threshold = 0
-            else:
-                if lfEval("has('nvim') && exists('g:GuiLoaded')") == '1':
-                    threshold = 2
-                else:
-                    threshold = 25
+            prefix = ""
 
             while 1:
+                if len(self._instance._manager._content) < 60000:
+                    threshold = 0.01
+                else:
+                    threshold = 0.10
+
                 self._buildPrompt()
                 self._idle = False
 
@@ -666,17 +683,19 @@ class LfCli(object):
                         if lfEval("has('nvim') && exists('g:GuiLoaded')") == '1':
                             time.sleep(0.009) # this is to solve issue 375 leaderF hangs in nvim-qt
 
-                        idle = min(idle + 1, 10000)
                         if update == True:
-                            if idle >= threshold:
+                            if time.time() - start >= threshold:
                                 update = False
-                                idle = 0
-                                yield '<Update>'
+                                if ''.join(self._cmdline).startswith(prefix):
+                                    yield '<Update>'
+                                else:
+                                    yield '<Shorten>'
+                                start = time.time()
                         else:
                             try:
                                 callback()
-                            except Exception as e:
-                                lfPrintError(e)
+                            except Exception:
+                                lfPrintTraceback()
                                 break
 
                         continue
@@ -690,17 +709,19 @@ class LfCli(object):
                         if lfEval("has('nvim') && exists('g:GuiLoaded')") == '1':
                             time.sleep(0.009) # this is to solve issue 375 leaderF hangs in nvim-qt
 
-                        idle = min(idle + 1, 10000)
                         if update == True:
-                            if idle >= threshold:
+                            if time.time() - start >= threshold:
                                 update = False
-                                idle = 0
-                                yield '<Update>'
+                                if ''.join(self._cmdline).startswith(prefix):
+                                    yield '<Update>'
+                                else:
+                                    yield '<Shorten>'
+                                start = time.time()
                         else:
                             try:
                                 callback()
-                            except Exception as e:
-                                lfPrintError(e)
+                            except Exception:
+                                lfPrintTraceback()
                                 break
 
                         continue
@@ -709,23 +730,27 @@ class LfCli(object):
                         lfCmd("let ch = !type(nr) ? nr2char(nr) : nr")
                         self._blinkon = True
                 else:
+                    threshold = 0
                     lfCmd("let nr = getchar()")
                     lfCmd("let ch = !type(nr) ? nr2char(nr) : nr")
                     self._blinkon = True
 
                 if lfEval("!type(nr) && nr >= 0x20") == '1':
+                    if update == False:
+                        update = True
+                        prefix = ''.join(self._cmdline)
+
                     self._insert(lfEval("ch"))
                     self._buildPattern()
                     if self._pattern is None or (self._refine and self._pattern[1] == ''): # e.g. abc;
                         continue
 
-                    update = True
-                    if idle < threshold:
+                    if time.time() - start < threshold:
                         continue
                     else:
-                        idle = 0
                         update = False
                         yield '<Update>'
+                        start = time.time()
                 else:
                     cmd = ''
                     for (key, value) in self._key_dict.items():
@@ -751,9 +776,20 @@ class LfCli(object):
                     elif equal(cmd, '<BS>') or equal(cmd, '<C-H>'):
                         if not self._pattern and self._refine == False:
                             continue
+
+                        if update == False:
+                            update = True
+                            prefix = ''.join(self._cmdline)
+
                         self._backspace()
                         self._buildPattern()
-                        yield '<Shorten>'
+
+                        if self._pattern and time.time() - start < threshold:
+                            continue
+                        else:
+                            update = False
+                            yield '<Shorten>'
+                            start = time.time()
                     elif equal(cmd, '<C-U>'):
                         if not self._pattern and self._refine == False:
                             continue

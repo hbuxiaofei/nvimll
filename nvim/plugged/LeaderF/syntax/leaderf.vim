@@ -107,6 +107,7 @@ function! g:LfDefineDefaultColors() abort
     highlight def Lf_hl_gtagsHighlight guifg=#000000 guibg=#cccc66 gui=NONE ctermfg=16 ctermbg=185 cterm=NONE
 
     highlight def link Lf_hl_previewTitle       Statusline
+    highlight def link Lf_hl_popupBorder        VertSplit
 
     highlight def link Lf_hl_winNumber          Constant
     highlight def link Lf_hl_winIndicators      Statement
@@ -121,4 +122,9 @@ function! g:LfDefineDefaultColors() abort
     highlight def link Lf_hl_loclistFileName    Directory
     highlight def link Lf_hl_loclistLineNumber  Constant
     highlight def link Lf_hl_loclistColumnNumber Constant
+
+    highlight def link Lf_hl_jumpsTitle         Title
+    highlight def link Lf_hl_jumpsNumber        Number
+    highlight def link Lf_hl_jumpsLineCol       String
+    highlight def link Lf_hl_jumpsIndicator     Type
 endfunction

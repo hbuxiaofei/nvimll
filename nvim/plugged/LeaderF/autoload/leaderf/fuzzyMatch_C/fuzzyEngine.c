@@ -1523,6 +1523,8 @@ static PyObject* fuzzyEngine_getHighlights(PyObject* self, PyObject* args, PyObj
         free(pGroup);
     }
 
+    free(pEngine->source);
+    free(tasks);
     free(pEngine->highlights);
 
     return res;
@@ -1727,7 +1729,7 @@ static PyObject* fuzzyEngine_guessMatch(PyObject* self, PyObject* args, PyObject
                 uint32_t offset = i * chunk_size;
                 uint32_t length = MIN(chunk_size, source_size - offset);
 
-                tasks[i].function = Q_SORT;
+                tasks[i].function = Q_SORT_2;
                 tasks[i].offset = offset;
                 tasks[i].length = length;
                 QUEUE_PUT(pEngine->task_queue, tasks + i);
@@ -1756,7 +1758,7 @@ static PyObject* fuzzyEngine_guessMatch(PyObject* self, PyObject* args, PyObject
 #endif
                 for ( i = 0; i < q; ++i )
                 {
-                    merge_tasks[i].function = MERGE;
+                    merge_tasks[i].function = MERGE_2;
                     merge_tasks[i].offset_1 = i * (chunk_size << 1);
                     merge_tasks[i].length_1 = chunk_size;
                     merge_tasks[i].length_2 = chunk_size;
@@ -1766,7 +1768,7 @@ static PyObject* fuzzyEngine_guessMatch(PyObject* self, PyObject* args, PyObject
 
                 if ( r > chunk_size )
                 {
-                    merge_tasks[i].function = MERGE;
+                    merge_tasks[i].function = MERGE_2;
                     merge_tasks[i].offset_1 = i * (chunk_size << 1);
                     merge_tasks[i].length_1 = chunk_size;
                     merge_tasks[i].length_2 = r - chunk_size;
@@ -1981,6 +1983,7 @@ static void rg_getDigest(char** str, uint32_t* length, RgParameter* param)
             {
                 if ( *p == ':' )
                 {
+                    minus = 0;
                     ++colon;
                     if ( (colon == 2 && !param->has_column) || colon == 3 )
                     {
@@ -1991,6 +1994,7 @@ static void rg_getDigest(char** str, uint32_t* length, RgParameter* param)
                 }
                 else if ( *p == '-' )
                 {
+                    colon = 0;
                     ++minus;
                     if ( minus == 2 )
                     {
@@ -1998,6 +2002,11 @@ static void rg_getDigest(char** str, uint32_t* length, RgParameter* param)
                         *length -= (uint32_t)(*str - s);
                         return;
                     }
+                }
+                else if ( !isdigit(*p) && colon + minus > 0 )
+                {
+                    colon = 0;
+                    minus = 0;
                 }
             }
         }
@@ -2016,6 +2025,10 @@ static void rg_getDigest(char** str, uint32_t* length, RgParameter* param)
                     *length -= (uint32_t)(*str - s);
                     return;
                 }
+            }
+            else if ( !isdigit(*p) && colon > 0 )
+            {
+                colon = 0;
             }
         }
     }
@@ -2059,11 +2072,11 @@ static void gtags_getDigest(char** str, uint32_t* length, GtagsParameter* param)
     uint32_t len = *length;
     char* p = NULL;
 
+    if ( param->match_path )
+        return;
+
     if ( param->format == 0 ) /* ctags-mod */
     {
-        if ( param->match_path )
-            return;
-
         uint8_t tab = 0;
         for ( p = s; p < s + len; ++p )
         {

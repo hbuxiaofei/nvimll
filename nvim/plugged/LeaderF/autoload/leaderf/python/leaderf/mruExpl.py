@@ -39,7 +39,7 @@ class MruExplorer(Explorer):
             f.writelines(lines)
 
         if "--cwd" in kwargs.get("arguments", {}):
-            lines = [name for name in lines if lfDecode(name).startswith(os.getcwd())]
+            lines = [name for name in lines if lfDecode(name).startswith(lfGetCwd())]
 
         lines = [line.rstrip() for line in lines] # remove the '\n'
         wildignore = lfEval("g:Lf_MruWildIgnore")
@@ -92,7 +92,7 @@ class MruExplorer(Explorer):
         return 'Mru'
 
     def getStlCurDir(self):
-        return escQuote(lfEncode(os.getcwd()))
+        return escQuote(lfEncode(lfGetCwd()))
 
     def supportsMulti(self):
         return True
@@ -149,17 +149,41 @@ class MruExplManager(Manager):
                 file = os.path.normpath(lfEncode(file))
 
             if kwargs.get("mode", '') == 't':
-                if lfEval("get(g:, 'Lf_JumpToExistingWindow', 1)") == '1':
-                    lfCmd("tab drop %s" % escSpecial(file))
+                if (lfEval("get(g:, 'Lf_DiscardEmptyBuffer', 1)") == '1' and vim.current.buffer.name == ''
+                        and vim.current.buffer.number == 1
+                        and len(vim.current.tabpage.windows) == 1 and len(vim.current.buffer) == 1
+                        and vim.current.buffer[0] == '' and not vim.current.buffer.options["modified"]
+                        and not (lfEval("get(g:, 'Lf_JumpToExistingWindow', 1)") == '1'
+                            and lfEval("bufloaded('%s')" % escQuote(file)) == '1'
+                            and len([w for tp in vim.tabpages for w in tp.windows if w.buffer.name == file]) > 0)):
+                    lfCmd("setlocal bufhidden=wipe")
+                    lfCmd("hide edit %s" % escSpecial(file))
+                elif lfEval("get(g:, 'Lf_JumpToExistingWindow', 1)") == '1' and lfEval("bufloaded('%s')" % escQuote(file)) == '1':
+                    lfDrop('tab', file)
                 else:
                     lfCmd("tabe %s" % escSpecial(file))
             else:
-                if lfEval("get(g:, 'Lf_JumpToExistingWindow', 1)") == '1' and lfEval("bufexists('%s')" % escQuote(file)) == '1':
-                    lfCmd("keepj hide drop %s" % escSpecial(file))
+                if lfEval("get(g:, 'Lf_JumpToExistingWindow', 1)") == '1' and lfEval("bufloaded('%s')" % escQuote(file)) == '1':
+                    if (kwargs.get("mode", '') == '' and lfEval("get(g:, 'Lf_DiscardEmptyBuffer', 1)") == '1'
+                            and vim.current.buffer.name == ''
+                            and vim.current.buffer.number == 1
+                            and len(vim.current.buffer) == 1 and vim.current.buffer[0] == ''
+                            and not vim.current.buffer.options["modified"]
+                            and len([w for w in vim.windows if w.buffer.name == file]) == 0):
+                        lfCmd("setlocal bufhidden=wipe")
+
+                    lfDrop('', file)
                 else:
+                    if (kwargs.get("mode", '') == '' and lfEval("get(g:, 'Lf_DiscardEmptyBuffer', 1)") == '1'
+                            and vim.current.buffer.name == ''
+                            and vim.current.buffer.number == 1
+                            and len(vim.current.buffer) == 1 and vim.current.buffer[0] == ''
+                            and not vim.current.buffer.options["modified"]):
+                        lfCmd("setlocal bufhidden=wipe")
+
                     lfCmd("hide edit %s" % escSpecial(file))
-        except vim.error as e: # E37
-            lfPrintError(e)
+        except vim.error: # E37
+            lfPrintTraceback()
 
     def _getDigest(self, line, mode):
         """
@@ -302,8 +326,11 @@ class MruExplManager(Manager):
             file = os.path.join(self._getInstance().getCwd(), lfDecode(file))
             file = os.path.normpath(lfEncode(file))
 
-        buf_number = lfEval("bufadd('{}')".format(escQuote(file)))
-        self._createPopupPreview(file, buf_number, 0)
+        if lfEval("bufloaded('%s')" % escQuote(file)) == '1':
+            source = int(lfEval("bufadd('%s')" % escQuote(file)))
+        else:
+            source = file
+        self._createPopupPreview(file, source, 0)
 
 
 #*****************************************************

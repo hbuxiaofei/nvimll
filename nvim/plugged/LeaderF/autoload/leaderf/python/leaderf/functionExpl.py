@@ -186,7 +186,7 @@ class FunctionExplorer(Explorer):
         return 'Function'
 
     def getStlCurDir(self):
-        return escQuote(lfEncode(os.getcwd()))
+        return escQuote(lfEncode(lfGetCwd()))
 
     def removeCache(self, buf_number):
         if buf_number in self._func_list:
@@ -224,11 +224,14 @@ class FunctionExplManager(Manager):
         line_nr, buf_number = line.rsplit(":", 1)[1].split()
         if kwargs.get("mode", '') == 't':
             buf_name = lfEval("bufname(%s)" % buf_number)
-            lfCmd("tab drop %s | %s" % (escSpecial(buf_name), line_nr))
+            lfDrop('tab', buf_name, line_nr)
         else:
             lfCmd("hide buffer +%s %s" % (line_nr, buf_number))
         lfCmd("norm! ^zv")
         lfCmd("norm! zz")
+
+        if "preview" not in kwargs:
+            lfCmd("setlocal cursorline! | redraw | sleep 150m | setlocal cursorline!")
 
         if vim.current.window not in self._cursorline_dict:
             self._cursorline_dict[vim.current.window] = vim.current.window.options["cursorline"]
@@ -341,7 +344,14 @@ class FunctionExplManager(Manager):
         self._getExplorer().removeCache(buf_number)
 
     def _previewResult(self, preview):
-        self._closePreviewPopup()
+        if self._getInstance().getWinPos() == 'floatwin':
+            self._cli.buildPopupPrompt()
+
+        if lfEval("get(g:, 'Lf_PreviewInPopup', 0)") == '1':
+            if self._orig_line != self._getInstance().currentLine:
+                self._closePreviewPopup()
+            else:
+                return
 
         if not self._needPreview(preview):
             return
@@ -358,7 +368,7 @@ class FunctionExplManager(Manager):
         vim.options['eventignore'] = 'BufLeave,WinEnter,BufEnter'
         try:
             vim.current.tabpage, vim.current.window, vim.current.buffer = orig_pos
-            self._acceptSelection(line)
+            self._acceptSelection(line, preview=True)
         finally:
             vim.current.tabpage, vim.current.window, vim.current.buffer = cur_pos
             vim.options['eventignore'] = saved_eventignore
@@ -379,6 +389,11 @@ class FunctionExplManager(Manager):
         self._relocateCursor()
 
     def _relocateCursor(self):
+        remember_last_status = "--recall" in self._arguments \
+                or lfEval("g:Lf_RememberLastSearch") == '1' and self._cli.pattern
+        if remember_last_status:
+            return
+
         inst = self._getInstance()
         if inst.empty():
             return
@@ -425,6 +440,7 @@ class FunctionExplManager(Manager):
         # {kind} {code} {file} {line}
         line = line.rsplit("\t", 1)[1][1:-1]    # file:line buf_number
         line_nr, buf_number = line.rsplit(":", 1)[1].split()
+        buf_number = int(buf_number)
 
         self._createPopupPreview("", buf_number, line_nr)
 

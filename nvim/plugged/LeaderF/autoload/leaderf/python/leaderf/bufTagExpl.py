@@ -189,7 +189,7 @@ class BufTagExplorer(Explorer):
         return 'BufTag'
 
     def getStlCurDir(self):
-        return escQuote(lfEncode(os.getcwd()))
+        return escQuote(lfEncode(lfGetCwd()))
 
     def removeCache(self, buf_number):
         if buf_number in self._tag_list:
@@ -237,7 +237,7 @@ class BufTagExplManager(Manager):
         buf_number = items[4]
         if kwargs.get("mode", '') == 't':
             buf_name = lfEval("bufname(%s)" % buf_number)
-            lfCmd("tab drop %s | %s" % (escSpecial(buf_name), line_nr))
+            lfDrop('tab', buf_name, line_nr)
         else:
             lfCmd("hide buffer +%s %s" % (line_nr, buf_number))
         if "preview" not in kwargs:
@@ -245,6 +245,9 @@ class BufTagExplManager(Manager):
             lfCmd("call search('\V%s', 'Wc', line('.'))" % escQuote(tagname))
         lfCmd("norm! zv")
         lfCmd("norm! zz")
+
+        if "preview" not in kwargs:
+            lfCmd("setlocal cursorline! | redraw | sleep 150m | setlocal cursorline!")
 
         if vim.current.window not in self._cursorline_dict:
             self._cursorline_dict[vim.current.window] = vim.current.window.options["cursorline"]
@@ -468,7 +471,14 @@ class BufTagExplManager(Manager):
         self._getExplorer().removeCache(buf_number)
 
     def _previewResult(self, preview):
-        self._closePreviewPopup()
+        if self._getInstance().getWinPos() == 'floatwin':
+            self._cli.buildPopupPrompt()
+
+        if lfEval("get(g:, 'Lf_PreviewInPopup', 0)") == '1':
+            if self._orig_line != self._getInstance().currentLine:
+                self._closePreviewPopup()
+            else:
+                return
 
         if not self._needPreview(preview):
             return
@@ -508,6 +518,11 @@ class BufTagExplManager(Manager):
         self._relocateCursor()
 
     def _relocateCursor(self):
+        remember_last_status = "--recall" in self._arguments \
+                or lfEval("g:Lf_RememberLastSearch") == '1' and self._cli.pattern
+        if remember_last_status:
+            return
+
         inst = self._getInstance()
         if inst.empty():
             return
@@ -568,7 +583,7 @@ class BufTagExplManager(Manager):
         items = re.split(" *\t *", line)
         tagname = items[0]
         line_nr = items[3].rsplit(":", 1)[1]
-        buf_number = items[4]
+        buf_number = int(items[4])
 
         self._createPopupPreview(tagname, buf_number, line_nr)
 

@@ -34,7 +34,7 @@ class QfLocListExplorer(Explorer):
         return self._list_type
 
     def getStlCurDir(self):
-        return escQuote(lfEncode(os.getcwd()))
+        return escQuote(lfEncode(lfGetCwd()))
 
     def supportsNameOnly(self):
         return True
@@ -70,17 +70,20 @@ class QfLocListExplManager(Manager):
                 file = os.path.normpath(lfEncode(file))
 
             if kwargs.get("mode", '') == 't':
-                lfCmd("tab drop %s" % escSpecial(file))
+                if lfEval("get(g:, 'Lf_JumpToExistingWindow', 1)") == '1' and lfEval("bufloaded('%s')" % escQuote(file)) == '1':
+                    lfDrop('tab', file)
+                else:
+                    lfCmd("tabe %s" % escSpecial(file))
             else:
-                if lfEval("get(g:, 'Lf_JumpToExistingWindow', 1)") == '1' and lfEval("bufexists('%s')" % escQuote(file)) == '1':
-                    lfCmd("keepj hide drop %s" % escSpecial(file))
+                if lfEval("get(g:, 'Lf_JumpToExistingWindow', 1)") == '1' and lfEval("bufloaded('%s')" % escQuote(file)) == '1':
+                    lfDrop('', file)
                 else:
                     lfCmd("hide edit %s" % escSpecial(file))
             lfCmd("call cursor(%s, %s)" % (line_num, col))
             lfCmd("norm! zv")
             lfCmd("norm! zz")
-        except vim.error as e: # E37
-            lfPrintError(e)
+        except vim.error: # E37
+            lfPrintTraceback()
 
     def _getDigest(self, line, mode):
         """
@@ -196,8 +199,11 @@ class QfLocListExplManager(Manager):
             file = os.path.join(self._getInstance().getCwd(), lfDecode(file))
             file = os.path.normpath(lfEncode(file))
 
-        buf_number = lfEval("bufadd('{}')".format(file))
-        self._createPopupPreview("", buf_number, line_num)
+        if lfEval("bufloaded('%s')" % escQuote(file)) == '1':
+            source = int(lfEval("bufadd('%s')" % escQuote(file)))
+        else:
+            source = file
+        self._createPopupPreview("", source, line_num)
 
 
 # *****************************************************

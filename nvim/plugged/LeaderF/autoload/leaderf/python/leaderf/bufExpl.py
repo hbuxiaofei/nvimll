@@ -103,7 +103,7 @@ class BufferExplorer(Explorer):
         return 'Buffer'
 
     def getStlCurDir(self):
-        return escQuote(lfEncode(os.getcwd()))
+        return escQuote(lfEncode(lfGetCwd()))
 
     def supportsNameOnly(self):
         return True
@@ -134,23 +134,22 @@ class BufExplManager(Manager):
         line = args[0]
         buf_number = int(re.sub(r"^.*?(\d+).*$", r"\1", line))
         if kwargs.get("mode", '') == 't':
-            buf_name = lfEval("bufname(%s)" % buf_number)
-            if buf_name:
-                lfCmd("tab drop %s" % escSpecial(buf_name))
+            for tp, w in ((tp, window) for tp in vim.tabpages for window in tp.windows):
+                if w.buffer.number == buf_number:
+                    vim.current.tabpage = tp
+                    vim.current.window = w
+                    break
             else:
-                lfCmd("hide buffer %d" % buf_number)
+                buf_name = vim.buffers[buf_number].name
+                lfCmd("tabe %s" % escSpecial(buf_name))
         else:
             if lfEval("get(g:, 'Lf_JumpToExistingWindow', 1)") == '1':
-                buf_name = lfEval("bufname(%s)" % buf_number)
-                if buf_name:
-                    lfCmd("keepj hide drop %s" % escSpecial(buf_name))
+                for w in vim.windows:
+                    if w.buffer.number == buf_number:
+                        vim.current.window = w
+                        break
                 else:
-                    for w in vim.windows:
-                        if w.buffer.number == buf_number:
-                            vim.current.window = w
-                            break
-                    else:
-                        lfCmd("hide buffer %d" % buf_number)
+                    lfCmd("hide buffer %d" % buf_number)
             else:
                 lfCmd("hide buffer %d" % buf_number)
 

@@ -7,6 +7,10 @@ import re
 import os
 import os.path
 import locale
+import traceback
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
 
 lfCmd = vim.command
 lfEval = vim.eval
@@ -42,6 +46,9 @@ if sys.version_info >= (3, 0):
             return bytes.decode(errors="ignore")
         except UnicodeDecodeError:
             return bytes.decode(errors="ignore")
+
+    def lfGetCwd():
+        return os.getcwd()
 
 else: # python 2.x
 
@@ -80,6 +87,9 @@ else: # python 2.x
 
     def lfBytes2Str(bytes, encoding=None):
         return bytes
+
+    def lfGetCwd():
+        return os.getcwdu().encode(lf_encoding)
 
 #-----------------------------------------------------------------------------
 
@@ -153,6 +163,14 @@ def lfPrintError(error):
         error = lfEncode(str(repr(error)))
         lfCmd("echohl Error | redraw | echo '%s' | echohl None" % escQuote(error))
 
+def lfPrintTraceback(msg=''):
+    error = traceback.format_exc()
+    error = error[error.find("\n") + 1:].strip()
+    if msg:
+        error = msg + "\n" + error
+    lfCmd("echohl WarningMsg | redraw")
+    lfCmd("echom '%s' | echohl None" % escQuote(error))
+
 def lfActualLineCount(buffer, start, end, col_width):
     num = 0
     for i in buffer[start:end]:
@@ -161,3 +179,45 @@ def lfActualLineCount(buffer, start, end, col_width):
         except:
             num += (int(lfEval("strdisplaywidth('%s')" % escQuote(i).replace('\x00', '\x01'))) + col_width - 1) // col_width
     return num
+
+def lfDrop(type, file_name, line_num=None):
+    if line_num:
+        line_num = int(line_num)
+
+    if 0 and lfEval("has('patch-8.0.1508')") == '1':
+        if type == "tab":
+            if line_num:
+                lfCmd("keepj tab drop %s | %d" % (escSpecial(file_name), line_num))
+            else:
+                lfCmd("keepj tab drop %s" % escSpecial(file_name))
+        else:
+            if line_num:
+                lfCmd("keepj hide drop %s | %d" % (escSpecial(file_name), line_num))
+            else:
+                lfCmd("keepj hide drop %s" % escSpecial(file_name))
+    else:
+        if type == "tab":
+            for tp, w in ((tp, window) for tp in vim.tabpages for window in tp.windows):
+                if w.buffer.name == file_name:
+                    vim.current.tabpage = tp
+                    vim.current.window = w
+                    if line_num:
+                        vim.current.window.cursor = (line_num, 0)
+                    break
+            else:
+                if line_num:
+                    lfCmd("tabe %s | %d" % (escSpecial(file_name), line_num))
+                else:
+                    lfCmd("tabe %s" % escSpecial(file_name))
+        else:
+            for w in vim.windows:
+                if w.buffer.name == file_name:
+                    vim.current.window = w
+                    if line_num:
+                        vim.current.window.cursor = (line_num, 0)
+                    break
+            else:
+                if line_num:
+                    lfCmd("hide edit +%d %s" % (line_num, escSpecial(file_name)))
+                else:
+                    lfCmd("hide edit %s" % escSpecial(file_name))

@@ -150,7 +150,7 @@ class AnyExplorer(Explorer):
         return self._category
 
     def getStlCurDir(self):
-        return escQuote(lfEncode(os.getcwd()))
+        return escQuote(lfEncode(lfGetCwd()))
 
     def supportsNameOnly(self):
         return bool(int(self._config.get("supports_name_only", False)))
@@ -377,8 +377,15 @@ class AnyExplManager(Manager):
                 preview = lfFunction(preview)
                 result = preview(orig_buf_nr, [l, c+1], line, self._arguments)
                 if result:
-                    buf_number, line_num, jump_cmd = result
-                    self._createPopupPreview("", buf_number, line_num, lfBytes2Str(jump_cmd) if not self._has_nvim else jump_cmd)
+                    filename, line_num, jump_cmd = result
+                    # for backward compatibility
+                    if isinstance(filename, int): # it is a buffer number
+                        pass
+                    elif lfEval("bufloaded('%s')" % escQuote(filename)) == '1':
+                        if not self._has_nvim:  # py3 in nvim return str, in vim return bytes
+                            filename = lfBytes2Str(filename)
+                        filename = int(lfEval("bufnr('%s')" % escQuote(filename))) # actually, it's a buffer number
+                    self._createPopupPreview("", filename, line_num, lfBytes2Str(jump_cmd) if not self._has_nvim else jump_cmd)
             except vim.error as err:
                 raise Exception("Error occurred in user defined %s: %s" % (str(preview), err))
 
@@ -706,6 +713,9 @@ class AnyHub(object):
                 from .qfloclistExpl import qfloclistExplManager
                 manager = qfloclistExplManager
                 kwargs["list_type"] = "loclist"
+            elif category == "jumps":
+                from .jumpsExpl import jumpsExplManager
+                manager = jumpsExplManager
             else:
                 import ctypes
                 manager_id = lfFunction(lfEval("g:Lf_PythonExtensions['%s'].manager_id" % category))()

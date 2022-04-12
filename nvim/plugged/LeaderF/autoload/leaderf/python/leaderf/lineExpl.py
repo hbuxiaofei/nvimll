@@ -44,7 +44,7 @@ class LineExplorer(Explorer):
         return 'Line'
 
     def getStlCurDir(self):
-        return escQuote(lfEncode(os.getcwd()))
+        return escQuote(lfEncode(lfGetCwd()))
 
 
 #*****************************************************
@@ -69,6 +69,9 @@ class LineExplManager(Manager):
         lfCmd("hide buffer +%s %s" % (line_nr, buf_number))
         lfCmd("norm! ^zv")
         lfCmd("norm! zz")
+
+        if "preview" not in kwargs:
+            lfCmd("setlocal cursorline! | redraw | sleep 150m | setlocal cursorline!")
 
         if vim.current.window not in self._cursorline_dict:
             self._cursorline_dict[vim.current.window] = vim.current.window.options["cursorline"]
@@ -101,6 +104,8 @@ class LineExplManager(Manager):
         help.append('" x : open file under cursor in a horizontally split window')
         help.append('" v : open file under cursor in a vertically split window')
         help.append('" t : open file under cursor in a new tabpage')
+        help.append('" Q : output result quickfix list ')
+        help.append('" L : output result location list ')
         help.append('" i/<Tab> : switch to input mode')
         help.append('" q : quit')
         help.append('" <F1> : toggle this help')
@@ -132,7 +137,33 @@ class LineExplManager(Manager):
         line = args[0]
         line = line.rsplit("\t", 1)[1][1:-1]    # file:line buf_number
         line_nr, buf_number = line.rsplit(":", 1)[1].split()
+        buf_number = int(buf_number)
         self._createPopupPreview(vim.buffers[int(buf_number)].name, buf_number, line_nr)
+
+    def outputToQflist(self, *args, **kwargs):
+        items = self._getFormatedContents()
+        lfCmd("call setqflist(%s, 'r')" % json.dumps(items))
+        lfCmd("echohl WarningMsg | redraw | echo ' Output result to quickfix list.' | echohl NONE")
+
+    def outputToLoclist(self, *args, **kwargs):
+        items = self._getFormatedContents()
+        winnr = lfEval('bufwinnr(%s)' % self._cur_buffer.number)
+        lfCmd("call setloclist(%d, %s, 'r')" % (int(winnr), json.dumps(items)))
+        lfCmd("echohl WarningMsg | redraw | echo ' Output result to location list.' | echohl NONE")
+
+    def _getFormatedContents(self):
+        items = []
+        for line in self._instance._buffer_object[self._help_length:]:
+            text, info = line.rsplit("\t", 1)
+            info = info[1:-1]    # file:line buf_number
+            line_nr, buf_number = info.rsplit(":", 1)[1].split()
+            items.append({
+                "filename": lfEval("getbufinfo(%d)[0]['name']" % int(buf_number)),
+                "lnum": line_nr,
+                "col": 1,
+                "text": text,
+            })
+        return items
 
 
 #*****************************************************

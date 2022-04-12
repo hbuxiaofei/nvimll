@@ -26,7 +26,7 @@ def showRelativePath(func):
     def deco(*args, **kwargs):
         if lfEval("g:Lf_ShowRelativePath") == '1':
             # os.path.relpath() is too slow!
-            dir = os.getcwd() if args[0]._cmd_work_dir == "" else args[1]
+            dir = lfGetCwd() if args[0]._cmd_work_dir == "" else args[1]
             cwd_length = len(lfEncode(dir))
             if not dir.endswith(os.sep):
                 cwd_length += 1
@@ -358,7 +358,7 @@ class FileExplorer(Explorer):
                 cmd = cd_cmd + 'rg --no-messages --files %s %s %s %s %s' % (color, ignore, followlinks, show_hidden, no_ignore)
             else:
                 cmd = 'rg --no-messages --files %s %s %s %s %s %s' % (color, ignore, followlinks, show_hidden, no_ignore, cur_dir)
-        elif default_tool["pt"] and lfEval("executable('pt')") == '1' and os.name != 'nt': # there is bug on Windows
+        elif default_tool["pt"] and lfEval("executable('pt')") == '1':
             wildignore = lfEval("g:Lf_WildIgnore")
             ignore = ""
             for i in wildignore.get("dir", []):
@@ -387,7 +387,7 @@ class FileExplorer(Explorer):
                 cmd = cd_cmd + 'pt --nocolor %s %s %s %s -g=""' % (ignore, followlinks, show_hidden, no_ignore)
             else:
                 cmd = 'pt --nocolor %s %s %s %s -g="" "%s"' % (ignore, followlinks, show_hidden, no_ignore, dir)
-        elif default_tool["ag"] and lfEval("executable('ag')") == '1' and os.name != 'nt': # https://github.com/vim/vim/issues/3236
+        elif default_tool["ag"] and lfEval("executable('ag')") == '1':
             wildignore = lfEval("g:Lf_WildIgnore")
             ignore = ""
             for i in wildignore.get("dir", []):
@@ -585,7 +585,7 @@ class FileExplorer(Explorer):
         if files:
             return self._readFromFileList(files)
 
-        dir = os.getcwd()
+        dir = lfGetCwd()
 
         self._cmd_work_dir = ""
         directory = kwargs.get("arguments", {}).get("directory")
@@ -594,9 +594,9 @@ class FileExplorer(Explorer):
             if os.path.exists(os.path.expanduser(lfDecode(dir))):
                 if lfEval("get(g:, 'Lf_NoChdir', 1)") == '0':
                     lfCmd("silent cd %s" % dir)
-                    dir = os.getcwd()
+                    dir = lfGetCwd()
                 else:
-                    dir = os.path.abspath(lfDecode(dir))
+                    dir = os.path.abspath(os.path.expanduser(lfDecode(dir)))
                     self._cmd_work_dir = dir
             else:
                 lfCmd("echohl ErrorMsg | redraw | echon "
@@ -658,7 +658,7 @@ class FileExplorer(Explorer):
         if self._cmd_work_dir:
             return escQuote(lfEncode(self._cmd_work_dir))
         else:
-            return escQuote(lfEncode(os.getcwd()))
+            return escQuote(lfEncode(lfGetCwd()))
 
     def supportsMulti(self):
         return True
@@ -761,7 +761,7 @@ class FileExplManager(Manager):
             super(FileExplManager, self).startExplorer(win_pos, *args, **kwargs)
             return
 
-        self._orig_cwd = os.getcwd()
+        self._orig_cwd = lfGetCwd()
         root_markers = lfEval("g:Lf_RootMarkers")
         mode = lfEval("g:Lf_WorkingDirectoryMode")
         working_dir = lfEval("g:Lf_WorkingDirectory")
@@ -810,8 +810,17 @@ class FileExplManager(Manager):
     @removeDevIcons
     def _previewInPopup(self, *args, **kwargs):
         line = args[0]
-        buf_number = lfEval("bufadd('{}')".format(escQuote(line)))
-        self._createPopupPreview(line, buf_number, 0)
+        if not os.path.isabs(line):
+            if self._getExplorer()._cmd_work_dir:
+                line = os.path.join(self._getExplorer()._cmd_work_dir, lfDecode(line))
+            else:
+                line = os.path.join(self._getInstance().getCwd(), lfDecode(line))
+            line = os.path.normpath(lfEncode(line))
+        if lfEval("bufloaded('%s')" % escQuote(line)) == '1':
+            source = int(lfEval("bufadd('%s')" % escQuote(line)))
+        else:
+            source = line
+        self._createPopupPreview(line, source, 0)
 
     @removeDevIcons
     def _acceptSelection(self, *args, **kwargs):
@@ -826,24 +835,41 @@ class FileExplManager(Manager):
                     file = os.path.join(self._getInstance().getCwd(), lfDecode(file))
                 file = os.path.normpath(lfEncode(file))
 
-            if kwargs.get("mode", '') != 't' or (lfEval("get(g:, 'Lf_DiscardEmptyBuffer', 0)") == '1'
-                    and len(vim.tabpages) == 1 and len(vim.current.tabpage.windows) == 1
-                    and vim.current.buffer.name == '' and len(vim.current.buffer) == 1
-                    and vim.current.buffer[0] == '' and not vim.current.buffer.options["modified"]):
-                if lfEval("get(g:, 'Lf_JumpToExistingWindow', 1)") == '1' and lfEval("bufexists('%s')" % escQuote(file)) == '1':
-                    lfCmd("keepj hide drop %s" % escSpecial(file))
-                else:
-                    if vim.current.buffer.options["modified"]:
-                        lfCmd("hide edit %s" % escSpecial(file))
-                    else:
-                        lfCmd("edit %s" % escSpecial(file))
-            else:
-                if lfEval("get(g:, 'Lf_JumpToExistingWindow', 1)") == '1':
-                    lfCmd("tab drop %s" % escSpecial(file))
+            if kwargs.get("mode", '') == 't':
+                if (lfEval("get(g:, 'Lf_DiscardEmptyBuffer', 1)") == '1' and vim.current.buffer.name == ''
+                        and vim.current.buffer.number == 1
+                        and len(vim.current.tabpage.windows) == 1 and len(vim.current.buffer) == 1
+                        and vim.current.buffer[0] == '' and not vim.current.buffer.options["modified"]
+                        and not (lfEval("get(g:, 'Lf_JumpToExistingWindow', 1)") == '1'
+                            and lfEval("bufloaded('%s')" % escQuote(file)) == '1'
+                            and len([w for tp in vim.tabpages for w in tp.windows if w.buffer.name == file]) > 0)):
+                    lfCmd("setlocal bufhidden=wipe")
+                    lfCmd("hide edit %s" % escSpecial(file))
+                elif lfEval("get(g:, 'Lf_JumpToExistingWindow', 1)") == '1' and lfEval("bufloaded('%s')" % escQuote(file)) == '1':
+                    lfDrop('tab', file)
                 else:
                     lfCmd("tabe %s" % escSpecial(file))
-        except vim.error as e: # E37
-            lfPrintError(e)
+            else:
+                if (lfEval("get(g:, 'Lf_JumpToExistingWindow', 1)") == '1' or kwargs.get("mode", 'dr')) and lfEval("bufloaded('%s')" % escQuote(file)) == '1':
+                    if (kwargs.get("mode", '') == '' and lfEval("get(g:, 'Lf_DiscardEmptyBuffer', 1)") == '1'
+                            and vim.current.buffer.name == ''
+                            and vim.current.buffer.number == 1
+                            and len(vim.current.buffer) == 1 and vim.current.buffer[0] == ''
+                            and not vim.current.buffer.options["modified"]
+                            and len([w for w in vim.windows if w.buffer.name == file]) == 0):
+                        lfCmd("setlocal bufhidden=wipe")
+                    lfDrop('', file)
+                else:
+                    if (kwargs.get("mode", '') == '' and lfEval("get(g:, 'Lf_DiscardEmptyBuffer', 1)") == '1'
+                            and vim.current.buffer.name == ''
+                            and vim.current.buffer.number == 1
+                            and len(vim.current.buffer) == 1 and vim.current.buffer[0] == ''
+                            and not vim.current.buffer.options["modified"]):
+                        lfCmd("setlocal bufhidden=wipe")
+
+                    lfCmd("hide edit %s" % escSpecial(file))
+        except vim.error: # E37
+            lfPrintTraceback()
 
 #*****************************************************
 # fileExplManager is a singleton
