@@ -65,6 +65,8 @@ set shiftwidth=4    " indent width
 set expandtab       " use space when <Tab>
 
 set colorcolumn=80
+set scrolloff=5
+set sidescrolloff=15
 set laststatus=2
 
 set encoding=utf-8
