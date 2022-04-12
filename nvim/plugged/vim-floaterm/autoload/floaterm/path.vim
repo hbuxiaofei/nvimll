@@ -62,7 +62,7 @@ function! s:find_root(path, markers, strict) abort
 endfunction
 
 " Replace string
-function! s:StringReplace(text, old, new) abort
+function! s:string_replace(text, old, new) abort
   let l:data = split(a:text, a:old, 1)
   return join(l:data, a:new)
 endfunction
@@ -127,20 +127,14 @@ function! s:path_join(home, name) abort
 endfunction
 
 function! floaterm#path#get_root() abort
-  let markers = g:floaterm_rootmarkers
   let strict = 0
-  let l:hr = s:find_root(getcwd(), markers, strict)
+  let l:hr = s:find_root(getcwd(), g:floaterm_rootmarkers, strict)
   if s:is_windows
-    let l:hr = s:StringReplace(l:hr, '/', "\\")
+    let l:hr = s:string_replace(l:hr, '/', "\\")
   endif
   return l:hr
 endfunction
 
 function! floaterm#path#chdir(path) abort
-  if has('nvim')
-    let cmd = haslocaldir()? 'lcd' : (haslocaldir(-1, 0)? 'tcd' : 'cd')
-  else
-    let cmd = haslocaldir()? ((haslocaldir() == 1)? 'lcd' : 'tcd') : 'cd'
-  endif
-  silent execute cmd . ' '. fnameescape(a:path)
+  silent execute 'tcd '. fnameescape(a:path)
 endfunction
