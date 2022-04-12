@@ -2,9 +2,15 @@
 
 > Dark powered asynchronous completion framework for neovim/Vim8
 
-[![Build Status](https://travis-ci.org/Shougo/deoplete.nvim.svg?branch=master)](https://travis-ci.org/Shougo/deoplete.nvim)
+**Note**: The development of this plugin is finished. Accepts minor patches and
+issues but no new features.
+[ddc.vim](https://github.com/Shougo/ddc.vim) is the next generation auto
+completion plugin. Consider migrating to it.
+
 [![Join the chat at https://gitter.im/Shougo/deoplete.nvim](https://badges.gitter.im/Shougo/deoplete.nvim.svg)](https://gitter.im/Shougo/deoplete.nvim?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Doc](https://img.shields.io/badge/doc-%3Ah%20deoplete-orange.svg)](doc/deoplete.txt)
+
+Please read [help](doc/deoplete.txt) for details.
 
 Note: If you need to understand what's different between deoplete and other
 similar plugins, please read "deoplete-faq" section in the documentation.
@@ -29,7 +35,7 @@ Here are some [completion sources](https://github.com/Shougo/deoplete.nvim/wiki/
 ## Install
 
 **Note:** deoplete requires Neovim (0.3.0+ and of course, **latest** is
-recommended) or Vim8 with Python 3.6.1+ and timers enabled.  See
+recommended) or Vim8.1 with Python 3.6.1+ and timers enabled.  See
 [requirements](#requirements) if you aren't sure whether you have this.
 
 Note: deoplete requires msgpack package 1.0.0+.
@@ -78,7 +84,8 @@ For manual installation(not recommended)
 
 deoplete requires Neovim or Vim8 with `if_python3`.
 
-If `:echo has("python3")` returns `1`, then you have python 3 support; otherwise, see below.
+If `:echo has("python3")` returns `1`, then you have python 3 support;
+otherwise, see below.
 
 You can enable Python3 interface with pip:
 
