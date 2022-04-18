@@ -20,7 +20,7 @@ syntax on
 
 set nobackup       " 取消备份
 set noswapfile     " 不创建交换文件
-set mouse=a        " 启用鼠标
+set mouse=nv       " 启用鼠标
 set colorcolumn=80
 set scrolloff=5
 set sidescrolloff=15
