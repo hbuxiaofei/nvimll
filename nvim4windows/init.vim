@@ -45,6 +45,8 @@ Plug 'lfv89/vim-interestingwords'
 Plug 'tpope/vim-fugitive'
 Plug 'mhinz/vim-signify'
 Plug 'dense-analysis/ale'
+Plug 'godlygeek/tabular'
+Plug 'preservim/vim-markdown'
 call plug#end()
 
 
@@ -104,6 +106,9 @@ endif
 
 " vim-signify
 let g:signify_sign_delete = '-'
+
+" vim-markdown
+let g:vim_markdown_folding_disabled = 1
 
 " Showing the cscope results in a quick-fix list
 if has("cscope")
