@@ -27,7 +27,6 @@ See `:help deoplete-options` for a complete list of options.
 ```shell
 # rustup toolchain add nightly   // maybe
 # rustup component add rust-src
-# cargo install racer
 ```
 
 - Golang

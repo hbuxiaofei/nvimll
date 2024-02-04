@@ -23,6 +23,7 @@ Plug 'terryma/vim-multiple-cursors', { 'do': ':UpdateRemotePlugins' }
 Plug 'tpope/vim-fugitive', { 'do': ':UpdateRemotePlugins' }
 Plug 'junegunn/gv.vim', { 'do': ':UpdateRemotePlugins' }
 
+Plug 'neoclide/coc.nvim', {'branch': 'master', 'do': 'npm ci'}
 Plug 'rust-lang/rust.vim', { 'do': ':UpdateRemotePlugins' }
 Plug 'tbodt/deoplete-tabnine', { 'do': './install.sh' }
 
@@ -192,6 +193,7 @@ autocmd BufRead,BufNewFile *.go let g:asyncrun_raw = 1
 " coc.nvim
 " weget https://nodejs.org/dist/v20.11.0/node-v20.11.0-linux-x64.tar.xz
 " wget https://github.com/rust-lang/rust-analyzer/releases/download/2024-01-29/rust-analyzer-x86_64-unknown-linux-gnu.gz
+" cd /root/.config/nvim/plugged/coc.nvim && npm ci
 " nvim -> :CocInstall coc-rust-analyzer
 " GoTo code navigation
 nmap <silent> gd <Plug>(coc-definition)
