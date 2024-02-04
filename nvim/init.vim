@@ -23,7 +23,6 @@ Plug 'terryma/vim-multiple-cursors', { 'do': ':UpdateRemotePlugins' }
 Plug 'tpope/vim-fugitive', { 'do': ':UpdateRemotePlugins' }
 Plug 'junegunn/gv.vim', { 'do': ':UpdateRemotePlugins' }
 
-Plug 'racer-rust/vim-racer', { 'do': ':UpdateRemotePlugins' }
 Plug 'rust-lang/rust.vim', { 'do': ':UpdateRemotePlugins' }
 Plug 'tbodt/deoplete-tabnine', { 'do': './install.sh' }
 
@@ -190,13 +189,15 @@ autocmd BufRead,BufNewFile *.go let g:asyncrun_raw = 1
 "   rustup component add rust-src
 " - set RUST_SRC_PATH environment (not necessary sometimes)
 "   export RUST_SRC_PATH=$(rustc --print sysroot)/lib/rustlib/src/rust/src
-augroup Racer
-    autocmd!
-    autocmd FileType rust nmap <buffer> gd         <Plug>(rust-def)
-    autocmd FileType rust nmap <buffer> <leader>gd <Plug>(rust-doc)
-augroup END
-let g:rustfmt_autosave = 1
-
+" coc.nvim
+" weget https://nodejs.org/dist/v20.11.0/node-v20.11.0-linux-x64.tar.xz
+" wget https://github.com/rust-lang/rust-analyzer/releases/download/2024-01-29/rust-analyzer-x86_64-unknown-linux-gnu.gz
+" nvim -> :CocInstall coc-rust-analyzer
+" GoTo code navigation
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
 
 " deoplete-tabnine
 " https://areweideyet.com
