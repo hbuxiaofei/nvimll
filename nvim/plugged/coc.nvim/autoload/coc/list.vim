@@ -40,9 +40,9 @@ function! coc#list#setlines(bufnr, lines, append)
 endfunction
 
 function! coc#list#options(...)
-  let list = ['--top', '--tab', '--normal', '--no-sort', '--input=', '--strict',
-        \ '--regex', '--interactive', '--number-select', '--auto-preview',
-        \ '--ignore-case', '--no-quit', '--first', '--reverse', '--height=']
+  let list = ['--top', '--tab', '--buffer', '--workspace-folder', '--normal', '--no-sort',
+   \ '--input=', '--strict', '--regex', '--interactive', '--number-select',
+   \ '--auto-preview', '--ignore-case', '--no-quit', '--first', '--reverse', '--height=']
   if get(g:, 'coc_enabled', 0)
     let names = coc#rpc#request('listNames', [])
     call extend(list, names)
@@ -98,6 +98,7 @@ function! coc#list#setup(source)
   setl norelativenumber bufhidden=wipe nocursorline winfixheight
   setl tabstop=1 nolist nocursorcolumn undolevels=-1
   setl signcolumn=auto
+  setl foldcolumn=0
   if exists('&cursorlineopt')
     setl cursorlineopt=both
   endif

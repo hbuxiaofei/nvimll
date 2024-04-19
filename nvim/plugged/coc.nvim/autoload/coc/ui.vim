@@ -7,6 +7,9 @@ let s:outline_preview_bufnr = 0
 
 " Check <Tab> and <CR>
 function! coc#ui#check_pum_keymappings(trigger) abort
+  if get(g:, 'coc_disable_mappings_check', 0) == 1
+    return
+  endif
   if a:trigger !=# 'none'
     for key in ['<cr>', '<tab>', '<c-y>', '<s-tab>']
       let arg = maparg(key, 'i', 0, 1)
@@ -333,11 +336,11 @@ function! coc#ui#open_url(url)
     return
   endif
   if has('mac') && executable('open')
-    call system('open '.a:url)
+    call system('open "'.a:url.'"')
     return
   endif
   if executable('xdg-open')
-    call system('xdg-open '.a:url)
+    call system('xdg-open "'.a:url.'"')
     return
   endif
   call system('cmd /c start "" /b '. substitute(a:url, '&', '^&', 'g'))

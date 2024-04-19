@@ -8,7 +8,7 @@ let s:namespace_map = {}
 let s:ns_id = 1
 let s:diagnostic_hlgroups = ['CocErrorHighlight', 'CocWarningHighlight', 'CocInfoHighlight', 'CocHintHighlight', 'CocDeprecatedHighlight', 'CocUnusedHighlight']
 " Maximum count to highlight each time.
-let g:coc_highlight_maximum_count = get(g:, 'coc_highlight_maximum_count', 100)
+let g:coc_highlight_maximum_count = get(g:, 'coc_highlight_maximum_count', 200)
 let s:term = &termguicolors == 0 && !has('gui_running')
 
 if has('nvim-0.5.0') && s:clear_match_by_window == 0
@@ -319,7 +319,9 @@ function! coc#highlight#add_highlight(bufnr, src_id, hl_group, line, col_start, 
       call nvim_buf_add_highlight(a:bufnr, a:src_id, a:hl_group, a:line, a:col_start, a:col_end)
     endif
   else
-    call coc#api#exec('buf_add_highlight', [a:bufnr, a:src_id, a:hl_group, a:line, a:col_start, a:col_end, opts])
+    if hlexists(a:hl_group)
+      call coc#api#exec('buf_add_highlight', [a:bufnr, a:src_id, a:hl_group, a:line, a:col_start, a:col_end, opts])
+    endif
   endif
 endfunction
 
@@ -726,15 +728,15 @@ function! s:update_highlights_timer(bufnr, changedtick, key, priority, groups, i
 endfunction
 
 function! s:add_highlights_timer(bufnr, ns, highlights, priority) abort
-  let hls = []
-  let next = []
-  for i in range(0, len(a:highlights) - 1)
-    if i < g:coc_highlight_maximum_count
-      call add(hls, a:highlights[i])
-    else
-      call add(next, a:highlights[i])
-    endif
-  endfor
+  let lhl = len(a:highlights)
+  let maxc = g:coc_highlight_maximum_count
+  if maxc < lhl
+    let hls = a:highlights[:maxc-1]
+    let next = a:highlights[maxc:]
+  else
+    let hls = a:highlights[:]
+    let next = []
+  endif
   call s:add_highlights(a:bufnr, a:ns, hls, a:priority)
   if len(next)
     call timer_start(30, {->s:add_highlights_timer(a:bufnr, a:ns, next, a:priority)})
@@ -742,6 +744,9 @@ function! s:add_highlights_timer(bufnr, ns, highlights, priority) abort
 endfunction
 
 function! s:add_highlights(bufnr, ns, highlights, priority) abort
+  if bufwinnr(a:bufnr) == -1 " check buffer exists
+    return
+  endif
   for item in a:highlights
     let opts = {
           \ 'priority': a:priority,

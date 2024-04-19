@@ -1,3 +1,24 @@
+# 2024-03-26
+
+- Added new `--workspace-folder` argument for diagnostics lists
+- Added new `--buffer` argument for diagnostics lists
+
+# 2024-02-28
+
+- Increase `g:coc_highlight_maximum_count` default to 200
+- Break change: semanticTokens highlight groups changed:
+  - `CocSem + type` to `CocSemType + type`
+  - `CocSem + modifier + type` to `CocSemTypeMod + type + modifier`
+
+# 2024-03-06
+
+- add `outline.autoHide` configuration to automatically hide the outline window when an item is clicked
+
+# 2024-02-27
+
+- Add `g:coc_disable_mappings_check` to disable key-mappings checking
+- Add `suggest.chineseSegments` configuration to control whether to divide Chinese sentences into segments or not
+
 # 2023-09-02
 
 - Support `g:coc_list_preview_filetype`.

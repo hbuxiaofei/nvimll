@@ -23,7 +23,7 @@ Plug 'terryma/vim-multiple-cursors', { 'do': ':UpdateRemotePlugins' }
 Plug 'tpope/vim-fugitive', { 'do': ':UpdateRemotePlugins' }
 Plug 'junegunn/gv.vim', { 'do': ':UpdateRemotePlugins' }
 
-Plug 'neoclide/coc.nvim', {'branch': 'master', 'do': 'npm ci'}
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'rust-lang/rust.vim', { 'do': ':UpdateRemotePlugins' }
 Plug 'tbodt/deoplete-tabnine', { 'do': './install.sh' }
 
@@ -184,22 +184,23 @@ nmap <silent> <F4> :cn<cr>
 let g:asyncrun_open=10
 autocmd BufRead,BufNewFile *.go let g:asyncrun_raw = 1
 
-" rust
-" This may need to:
-" - install rust-src
-"   rustup component add rust-src
-" - set RUST_SRC_PATH environment (not necessary sometimes)
-"   export RUST_SRC_PATH=$(rustc --print sysroot)/lib/rustlib/src/rust/src
 " coc.nvim
+" all coc extensions: https://github.com/neoclide/coc.nvim/wiki/Using-coc-extensions
+"
 " weget https://nodejs.org/dist/v20.11.0/node-v20.11.0-linux-x64.tar.xz
-" wget https://github.com/rust-lang/rust-analyzer/releases/download/2024-01-29/rust-analyzer-x86_64-unknown-linux-gnu.gz
-" cd /root/.config/nvim/plugged/coc.nvim && npm ci
-" nvim -> :CocInstall coc-rust-analyzer
-" GoTo code navigation
+" tar -xf node-v20.11.0-linux-x64.tar.xz --strip-components 1 -C /usr/
 nmap <silent> gd <Plug>(coc-definition)
 nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
+
+" coc.nvim rust
+" wget https://github.com/rust-lang/rust-analyzer/releases/download/2024-01-29/rust-analyzer-x86_64-unknown-linux-gnu.gz
+" nvim -> :CocInstall coc-rust-analyzer
+
+" coc.nvim c++
+" wget https://github.com/clangd/clangd/releases/download/18.1.3/clangd-linux-18.1.3.zip
+" nvim -> :CocInstall coc-clangd
 
 " deoplete-tabnine
 " https://areweideyet.com
