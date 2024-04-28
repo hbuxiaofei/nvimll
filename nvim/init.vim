@@ -44,6 +44,9 @@ set number
 syntax enable
 syntax on
 
+" highlight current line
+set cursorline
+
 " colorscheme peachpuff
 colorscheme monokai
 
