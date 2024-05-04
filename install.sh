@@ -1,5 +1,10 @@
 #!/bin/bash
 
+USRLOCAL_BIN=/usr/local/bin
+export PATH=$USRLOCAL_BIN:$PATH
+
+INSTALL_HOME=$HOME
+[ -n "$SUDO_USER" ] && INSTALL_HOME=/home/$SUDO_USER
 
 cd $(dirname $0)
 
@@ -41,27 +46,27 @@ install_ripgrep()
 }
 
 # prepare
-if [ -d $HOME/.local/share/nvim/site/autoload ]; then
-	rm -rf $HOME/.local/share/nvim/site/autoload
+if [ -d $INSTALL_HOME/.local/share/nvim/site/autoload ]; then
+	rm -rf $INSTALL_HOME/.local/share/nvim/site/autoload
 fi
 
-if [ -d $HOME/.config/nvim ]; then
-	rm -rf $HOME/.config/nvim
+if [ -d $INSTALL_HOME/.config/nvim ]; then
+	rm -rf $INSTALL_HOME/.config/nvim
 fi
 
 
 # copy files
 echo -e "\033[32m- [Info] Start to copy files\033[0m"
 
-if [ ! -d $HOME/.local/share/nvim/site ]; then
-	mkdir -p $HOME/.local/share/nvim/site
+if [ ! -d $INSTALL_HOME/.local/share/nvim/site ]; then
+	mkdir -p $INSTALL_HOME/.local/share/nvim/site
 fi
-cp -rf autoload $HOME/.local/share/nvim/site/
+cp -rf autoload $INSTALL_HOME/.local/share/nvim/site/
 
-if [ ! -d $HOME/.config ]; then
-	mkdir -p $HOME/.config
+if [ ! -d $INSTALL_HOME/.config ]; then
+	mkdir -p $INSTALL_HOME/.config
 fi
-cp -rf nvim $HOME/.config/
+cp -rf nvim $INSTALL_HOME/.config/
 
 
 # install command
