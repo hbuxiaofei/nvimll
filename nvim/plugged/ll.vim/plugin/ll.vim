@@ -66,10 +66,11 @@ endfunction
 
 let s:nerdtree_buffer_number = 0
 function! LLvimNERDTreeToggle()
-  exec "NERDTreeToggle"
   if g:NERDTree.IsOpen()
+    exec "NERDTreeToggle"
     let s:nerdtree_buffer_number = buffer_number()
   else
+    exec "NERDTreeFind"
     let s:nerdtree_buffer_number = 0
   endif
 endfunction
