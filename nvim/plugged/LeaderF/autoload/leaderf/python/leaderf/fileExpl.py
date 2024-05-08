@@ -58,7 +58,7 @@ class FileExplorer(Explorer):
         self._cur_dir = ''
         self._content = []
         self._cache_dir = os.path.join(lfEval("g:Lf_CacheDirectory"),
-                                       '.LfCache',
+                                       'LeaderF',
                                        'python' + lfEval("g:Lf_PythonVersion"),
                                        'file')
         self._cache_index = os.path.join(self._cache_dir, 'cacheIndex')
@@ -107,7 +107,7 @@ class FileExplorer(Explorer):
                     target = i
 
             if target != -1:
-                lines[target] = re.sub('^\S*',
+                lines[target] = re.sub(r'^\S*',
                                        '%.3f' % time.time(),
                                        lines[target])
                 f.seek(0)
@@ -185,7 +185,7 @@ class FileExplorer(Explorer):
                     target = i
 
             if target != -1:
-                lines[target] = re.sub('^\S*', '%.3f' % time.time(), lines[target])
+                lines[target] = re.sub(r'^\S*', '%.3f' % time.time(), lines[target])
                 f.seek(0)
                 f.truncate(0)
                 f.writelines(lines)
@@ -433,7 +433,7 @@ class FileExplorer(Explorer):
                 followlinks = ""
 
             if lfEval("g:Lf_ShowRelativePath") == '1':
-                strip = "| sed 's#^\./##'"
+                strip = r"| sed 's#^\./##'"
             else:
                 strip = ""
 
@@ -490,7 +490,7 @@ class FileExplorer(Explorer):
                     return
 
                 # update the time
-                lines[target] = re.sub('^\S*',
+                lines[target] = re.sub(r'^\S*',
                                        '%.3f' % time.time(),
                                        lines[target])
                 f.seek(0)
@@ -545,7 +545,7 @@ class FileExplorer(Explorer):
 
             if target != -1:    # already cached
                 # update the time
-                lines[target] = re.sub('^\S*',
+                lines[target] = re.sub(r'^\S*',
                                        '%.3f' % time.time(),
                                        lines[target])
                 f.seek(0)
@@ -580,6 +580,48 @@ class FileExplorer(Explorer):
         if lfEval("g:Lf_UseCache") == '1':
             self._writeCache(content)
 
+    def getContentFromMultiDirs(self, dirs, **kwargs):
+        no_ignore = kwargs.get("arguments", {}).get("--no-ignore")
+        if no_ignore != self._no_ignore:
+            self._no_ignore = no_ignore
+            arg_changes = True
+        else:
+            arg_changes = False
+
+        dirs = { os.path.abspath(os.path.expanduser(lfDecode(dir.strip('"').rstrip('\\/')))) for dir in dirs }
+        if arg_changes or lfEval("g:Lf_UseMemoryCache") == '0' or dirs != self._cur_dir or \
+                not self._content:
+            self._cur_dir = dirs
+
+            cmd = ''
+            for dir in dirs:
+                if not os.path.exists(dir):
+                    lfCmd("echoe ' Unknown directory `%s`'" % dir)
+                    return None
+
+                command = self._buildCmd(dir, **kwargs)
+                if command:
+                    if cmd == '':
+                        cmd = command
+                    else:
+                        cmd += ' && ' + command
+
+            if cmd:
+                executor = AsyncExecutor()
+                self._executor.append(executor)
+                if cmd.split(None, 1)[0] == "dir":
+                    content = executor.execute(cmd, format_line)
+                else:
+                    if lfEval("get(g:, 'Lf_ShowDevIcons', 1)") == "1":
+                        content = executor.execute(cmd, encoding=lfEval("&encoding"), format_line=format_line)
+                    else:
+                        content = executor.execute(cmd, encoding=lfEval("&encoding"))
+                self._cmd_start_time = time.time()
+                return content
+
+        return self._content
+
+
     def getContent(self, *args, **kwargs):
         files = kwargs.get("arguments", {}).get("--file", [])
         if files:
@@ -589,6 +631,9 @@ class FileExplorer(Explorer):
 
         self._cmd_work_dir = ""
         directory = kwargs.get("arguments", {}).get("directory")
+        if directory and len(directory) > 1:
+            return self.getContentFromMultiDirs(directory, **kwargs)
+
         if directory and directory[0] not in ['""', "''"]:
             dir = directory[0].strip('"').rstrip('\\/')
             if os.path.exists(os.path.expanduser(lfDecode(dir))):
@@ -599,8 +644,7 @@ class FileExplorer(Explorer):
                     dir = os.path.abspath(os.path.expanduser(lfDecode(dir)))
                     self._cmd_work_dir = dir
             else:
-                lfCmd("echohl ErrorMsg | redraw | echon "
-                      "'Unknown directory `%s`' | echohl NONE" % dir)
+                lfCmd("echoe ' Unknown directory `%s`'" % dir)
                 return None
 
         no_ignore = kwargs.get("arguments", {}).get("--no-ignore")
@@ -699,31 +743,6 @@ class FileExplManager(Manager):
         help.append('" ---------------------------------------------------------')
         return help
 
-    def _nearestAncestor(self, markers, path):
-        """
-        return the nearest ancestor path(including itself) of `path` that contains
-        one of files or directories in `markers`.
-        `markers` is a list of file or directory names.
-        """
-        if os.name == 'nt':
-            # e.g. C:\\
-            root = os.path.splitdrive(os.path.abspath(path))[0] + os.sep
-        else:
-            root = '/'
-
-        path = os.path.abspath(path)
-        while path != root:
-            for name in markers:
-                if os.path.exists(os.path.join(path, name)):
-                    return path
-            path = os.path.abspath(os.path.join(path, ".."))
-
-        for name in markers:
-            if os.path.exists(os.path.join(path, name)):
-                return path
-
-        return ""
-
     def _afterEnter(self):
         super(FileExplManager, self)._afterEnter()
         lfCmd("augroup Lf_File")
@@ -780,14 +799,14 @@ class FileExplManager(Manager):
         cur_buf_name = lfDecode(vim.current.buffer.name)
         fall_back = False
         if 'a' in mode:
-            working_dir = self._nearestAncestor(root_markers, self._orig_cwd)
+            working_dir = nearestAncestor(root_markers, self._orig_cwd)
             if working_dir: # there exists a root marker in nearest ancestor path
                 chdir(working_dir)
             else:
                 fall_back = True
         elif 'A' in mode:
             if cur_buf_name:
-                working_dir = self._nearestAncestor(root_markers, os.path.dirname(cur_buf_name))
+                working_dir = nearestAncestor(root_markers, os.path.dirname(cur_buf_name))
             else:
                 working_dir = ""
             if working_dir: # there exists a root marker in nearest ancestor path
@@ -809,6 +828,9 @@ class FileExplManager(Manager):
 
     @removeDevIcons
     def _previewInPopup(self, *args, **kwargs):
+        if len(args) == 0 or args[0] == '':
+            return
+
         line = args[0]
         if not os.path.isabs(line):
             if self._getExplorer()._cmd_work_dir:
@@ -867,9 +889,19 @@ class FileExplManager(Manager):
                             and not vim.current.buffer.options["modified"]):
                         lfCmd("setlocal bufhidden=wipe")
 
-                    lfCmd("hide edit %s" % escSpecial(file))
-        except vim.error: # E37
-            lfPrintTraceback()
+                    m = lfEval("get(g:, 'Lf_FileActions', {})")
+                    if m != {}:
+                        try:
+                            extension = os.path.splitext(file)[-1]
+                            filecmd = m[extension]
+                            lfCmd("%s %s" % (filecmd, escSpecial(file)))
+                        except KeyError:
+                            lfCmd("hide edit %s" % escSpecial(file))
+                    else:
+                        lfCmd("hide edit %s" % escSpecial(file))
+        except vim.error as e: # E37
+            if 'E325' not in str(e).split(':'):
+                lfPrintTraceback()
 
 #*****************************************************
 # fileExplManager is a singleton

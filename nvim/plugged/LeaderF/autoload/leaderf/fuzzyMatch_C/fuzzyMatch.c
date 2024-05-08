@@ -428,7 +428,6 @@ ValueElements* evaluate(TextContext* pText_ctxt,
         }
         if ( bits == 0 )
         {
-            memset(val, 0, sizeof(ValueElements));
             return val;
         }
         else
@@ -469,13 +468,15 @@ ValueElements* evaluate(TextContext* pText_ctxt,
 #endif
         special = k == 0 ? 5 : 3;
     else if ( isupper(text[i]) )
-        special = !isupper(text[i-1]) || (i+1 < text_len && islower(text[i+1])) ? 3 : 0;
+        special = (!isupper(text[i-1]) || (i+1 < text_len && islower(text[i+1])) ?
+                   (i < 5 ? 5 : 3) : 0);
     /* else if ( text[i-1] == '_' || text[i-1] == '-' || text[i-1] == ' ' ) */
     /*     special = 3;                                                     */
     /* else if ( text[i-1] == '.' )                                         */
     /*     special = 3;                                                     */
     else if ( !isalnum(text[i-1]) )
-        special = 3;
+        /* if there is an icon at the beginning, `if ( i == 0 )` won't meet */
+        special = i < 5 ? 5 : 3;
     else
         special = 0;
     ++i;
@@ -892,7 +893,7 @@ float getWeight(const char* text, uint16_t text_len,
 
         free(text_mask);
 
-        return score + (float)pattern_len/text_len + (float)(pattern_len << 1)/(text_len - beg);
+        return score + (float)(pattern_len<<1)/text_len + (float)pattern_len/(text_len - beg);
     }
 }
 
@@ -1260,23 +1261,20 @@ HighlightGroup* evaluateHighlights(TextContext* pText_ctxt,
                     max_prefix_score = prefix_score;
                     pText_ctxt->offset = i;
                     HighlightGroup* pGroup = evaluateHighlights(pText_ctxt, pPattern_ctxt, k + n, groups);
-                    if ( pGroup )
+                    if ( pGroup && pGroup->end )
                     {
-                        if ( pGroup->end )
-                        {
-                            score = prefix_score + pGroup->score - 0.3f * (pGroup->beg - i);
-                            cur_highlights.score = score;
-                            cur_highlights.beg = i - n;
-                            cur_highlights.end = pGroup->end;
-                            cur_highlights.positions[0].col = i - n + 1;
-                            cur_highlights.positions[0].len = n;
-                            memcpy(cur_highlights.positions + 1, pGroup->positions, pGroup->end_index * sizeof(HighlightPos));
-                            cur_highlights.end_index = pGroup->end_index + 1;
-                        }
-                        else
-                        {
-                            break;
-                        }
+                        score = prefix_score + pGroup->score - 0.3f * (pGroup->beg - i);
+                        cur_highlights.score = score;
+                        cur_highlights.beg = i - n;
+                        cur_highlights.end = pGroup->end;
+                        cur_highlights.positions[0].col = i - n + 1;
+                        cur_highlights.positions[0].len = n;
+                        memcpy(cur_highlights.positions + 1, pGroup->positions, pGroup->end_index * sizeof(HighlightPos));
+                        cur_highlights.end_index = pGroup->end_index + 1;
+                    }
+                    else
+                    {
+                        break;
                     }
                 }
             }

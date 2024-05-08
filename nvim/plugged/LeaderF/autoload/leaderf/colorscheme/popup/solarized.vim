@@ -1,69 +1,38 @@
-" ============================================================================
-" File:        gruvbox_default.vim
-" Description:
-" Author:      Yggdroot <archofortune@gmail.com>
-" Website:     https://github.com/Yggdroot
-" Note:
-" License:     Apache License, Version 2.0
-" ============================================================================
-
-" due to https://github.com/vim/vim/issues/5227,
-" if aim to link to another highlight group,
-" it is better to use leaderf#colorscheme#popup#link_no_reverse()
-" instead of `hi link`. Because some BAD colorscheme such as solarized8_flat
-" like using `reverse` attribute.
-
 if &background ==? 'dark'
-    " Lf_hl_popup_inputText is the wincolor of input window
-    highlight def Lf_hl_popup_inputText guifg=#dfebb2 guibg=#413d39 gui=NONE ctermfg=187 ctermbg=237 cterm=NONE
-
-    " Lf_hl_popup_window is the wincolor of content window
+    highlight def Lf_hl_popup_inputText    guifg=#839496 ctermfg=102 guibg=#002b36 ctermbg=17
     call leaderf#colorscheme#popup#link_no_reverse("Lf_hl_popup_window", "Normal")
-
-    " Lf_hl_popup_blank is the wincolor of statusline window
     call leaderf#colorscheme#popup#link_no_reverse("Lf_hl_popup_blank", "StatusLineNC")
-
-    " nvim has a weird bug, if `hi Cursor cterm=reverse gui=reverse`
-    " and `hi def link Lf_hl_popup_cursor Cursor`, the bug occurs.
-    call leaderf#colorscheme#popup#link_cursor("Lf_hl_popup_cursor")
-
+    highlight def Lf_hl_popup_cursor       guifg=#657b83 ctermfg=66  guibg=#93a1a1 ctermbg=109
     call leaderf#colorscheme#popup#link_two("Lf_hl_popupBorder", "Normal", "VertSplit", 1)
+    highlight def Lf_hl_popup_prompt       guifg=#b58900 ctermfg=136 guibg=#002b36 ctermbg=17   gui=bold cterm=bold
+    highlight def Lf_hl_popup_spin         guifg=#fdf6e3 ctermfg=230 guibg=#002b36 ctermbg=17
+    highlight def Lf_hl_popup_normalMode   guifg=#fdf6e3 ctermfg=230 guibg=#93a1a1 ctermbg=109  gui=bold cterm=bold
+    highlight def Lf_hl_popup_inputMode    guifg=#fdf6e3 ctermfg=230 guibg=#b58900 ctermbg=136  gui=bold cterm=bold
+    highlight def Lf_hl_popup_category     guifg=#eee8d5 ctermfg=224 guibg=#657b83 ctermbg=66
+    highlight def Lf_hl_popup_nameOnlyMode guifg=#eee8d5 ctermfg=224 guibg=#268bd2 ctermbg=32
+    highlight def Lf_hl_popup_fullPathMode guifg=#eee8d5 ctermfg=224 guibg=#586e75 ctermbg=60
+    highlight def Lf_hl_popup_fuzzyMode    guifg=#eee8d5 ctermfg=224 guibg=#586e75 ctermbg=60
+    highlight def Lf_hl_popup_regexMode    guifg=#eee8d5 ctermfg=224 guibg=#dc322f ctermbg=166
+    highlight def Lf_hl_popup_cwd          guifg=#93a1a1 ctermfg=109 guibg=#073642 ctermbg=23
+    highlight def Lf_hl_popup_lineInfo     guifg=#eee8d5 ctermfg=224 guibg=#657b83 ctermbg=66
+    highlight def Lf_hl_popup_total        guifg=#fdf6e3 ctermfg=230 guibg=#93a1a1 ctermbg=109
 
-    highlight def Lf_hl_popup_prompt guifg=#fabd2f guibg=NONE gui=NONE ctermfg=214 ctermbg=NONE cterm=NONE
-    highlight def Lf_hl_popup_spin guifg=#e6e666 guibg=NONE gui=NONE ctermfg=185 ctermbg=NONE cterm=NONE
-    highlight def Lf_hl_popup_normalMode guifg=#282828 guibg=#a89984 gui=bold ctermfg=235 ctermbg=137 cterm=bold
-    highlight def Lf_hl_popup_inputMode guifg=#504945 guibg=#83a598 gui=bold ctermfg=239 ctermbg=109 cterm=bold
-    highlight def Lf_hl_popup_category guifg=#d5c4a1 guibg=#665c54 gui=NONE ctermfg=187 ctermbg=59 cterm=NONE
-    highlight def Lf_hl_popup_nameOnlyMode guifg=#bdae93 guibg=#504945 gui=NONE ctermfg=144 ctermbg=239 cterm=NONE
-    highlight def Lf_hl_popup_fullPathMode guifg=#bdae93 guibg=#504945 gui=NONE ctermfg=144 ctermbg=239 cterm=NONE
-    highlight def Lf_hl_popup_fuzzyMode guifg=#bdae93 guibg=#504945 gui=NONE ctermfg=144 ctermbg=239 cterm=NONE
-    highlight def Lf_hl_popup_regexMode guifg=#bdae93 guibg=#504945 gui=NONE ctermfg=144 ctermbg=239 cterm=NONE
-    highlight def Lf_hl_popup_cwd guifg=#a89984 guibg=#413b39 gui=NONE ctermfg=144 ctermbg=237 cterm=NONE
-    highlight def Lf_hl_popup_lineInfo guifg=#d5c4a1 guibg=#6a635c gui=NONE ctermfg=187 ctermbg=241 cterm=NONE
-    highlight def Lf_hl_popup_total guifg=#282828 guibg=#a89984 gui=NONE ctermfg=234 ctermbg=102 cterm=NONE
+    highlight def Lf_hl_cursorline         guifg=#fdf6e3 ctermfg=230
 
-    " the color of the cursorline
-    highlight def Lf_hl_cursorline guifg=#cdcf2a guibg=NONE gui=NONE ctermfg=184 ctermbg=NONE cterm=NONE
-
-    " the color of matching character
-    highlight def Lf_hl_match guifg=#87d37c guibg=NONE gui=bold ctermfg=114 ctermbg=NONE cterm=bold
-
-    " the color of matching character in `And mode`
-    highlight def Lf_hl_match0 guifg=#87d37c guibg=NONE gui=bold ctermfg=114 cterm=bold
-    highlight def Lf_hl_match1 guifg=#fe8019 guibg=NONE gui=bold ctermfg=208 cterm=bold
-    highlight def Lf_hl_match2 guifg=#3ff5d1 guibg=NONE gui=bold ctermfg=50 cterm=bold
-    highlight def Lf_hl_match3 guifg=#ff7272 guibg=NONE gui=bold ctermfg=203 cterm=bold
-    highlight def Lf_hl_match4 guifg=#43b9f0 guibg=NONE gui=bold ctermfg=74 cterm=bold
-
-    " the color of matching character in nameOnly mode when ';' is typed
-    highlight def Lf_hl_matchRefine guifg=#d3869b gui=bold ctermfg=175 cterm=bold
+    highlight def Lf_hl_match              guifg=#b58900 ctermfg=136 guibg=NONE    ctermbg=NONE gui=bold cterm=bold
+    highlight def Lf_hl_match0             guifg=#d33682 ctermfg=168 guibg=NONE    ctermbg=NONE gui=bold cterm=bold
+    highlight def Lf_hl_match1             guifg=#6c71c4 ctermfg=62  guibg=NONE    ctermbg=NONE gui=bold cterm=bold
+    highlight def Lf_hl_match2             guifg=#268bd2 ctermfg=32  guibg=NONE    ctermbg=NONE gui=bold cterm=bold
+    highlight def Lf_hl_match3             guifg=#2aa198 ctermfg=36  guibg=NONE    ctermbg=NONE gui=bold cterm=bold
+    highlight def Lf_hl_match4             guifg=#859900 ctermfg=100 guibg=NONE    ctermbg=NONE gui=bold cterm=bold
+    highlight def Lf_hl_matchRefine        guifg=#cb4b16 ctermfg=166
 
     " the color of help in normal mode when <F1> is pressed
     highlight def link Lf_hl_help               Comment
     highlight def link Lf_hl_helpCmd            Identifier
 
     " the color when select multiple lines
-    highlight def Lf_hl_selection guifg=#282828 guibg=#8ec07c gui=NONE ctermfg=235 ctermbg=107 cterm=NONE
+    highlight def Lf_hl_selection guifg=#4d4d4d guibg=#a5eb84 gui=NONE ctermfg=239 ctermbg=156 cterm=NONE
 
     " the color of `Leaderf buffer`
     highlight def link Lf_hl_bufNumber          Constant
@@ -111,12 +80,12 @@ if &background ==? 'dark'
     highlight def link Lf_hl_rgLineNumber2      Folded
     " the color of column number if '--column' in g:Lf_RgConfig
     highlight def link Lf_hl_rgColumnNumber     Constant
-    highlight def Lf_hl_rgHighlight guifg=#000000 guibg=#cccc66 gui=NONE ctermfg=16 ctermbg=185 cterm=NONE
+    highlight def Lf_hl_rgHighlight guifg=#4d4d4d guibg=#cccc66 gui=NONE ctermfg=239 ctermbg=185 cterm=NONE
 
     " the color of `Leaderf gtags`
     highlight def link Lf_hl_gtagsFileName      Directory
     highlight def link Lf_hl_gtagsLineNumber    Constant
-    highlight def Lf_hl_gtagsHighlight guifg=#000000 guibg=#cccc66 gui=NONE ctermfg=16 ctermbg=185 cterm=NONE
+    highlight def Lf_hl_gtagsHighlight guifg=#4d4d4d guibg=#cccc66 gui=NONE ctermfg=239 ctermbg=185 cterm=NONE
 
     highlight def link Lf_hl_previewTitle       Statusline
 
@@ -137,57 +106,40 @@ if &background ==? 'dark'
     highlight def link Lf_hl_jumpsLineCol       String
     highlight def link Lf_hl_jumpsIndicator     Type
 else
-    " Lf_hl_popup_inputText is the wincolor of input window
-    highlight def Lf_hl_popup_inputText guifg=#504945 guibg=#faefb2 gui=NONE ctermfg=239 ctermbg=253 cterm=NONE
-
-    " Lf_hl_popup_window is the wincolor of content window
+    highlight def Lf_hl_popup_inputText    guifg=#657b83 ctermfg=66  guibg=#fdf6e3 ctermbg=230
     call leaderf#colorscheme#popup#link_no_reverse("Lf_hl_popup_window", "Normal")
-
-    " Lf_hl_popup_blank is the wincolor of statusline window
     call leaderf#colorscheme#popup#link_no_reverse("Lf_hl_popup_blank", "StatusLineNC")
-
-    " nvim has a weird bug, if `hi Cursor cterm=reverse gui=reverse`
-    " and `hi def link Lf_hl_popup_cursor Cursor`, the bug occurs.
-    call leaderf#colorscheme#popup#link_cursor("Lf_hl_popup_cursor")
-
+    highlight def Lf_hl_popup_cursor       guifg=#b58900 ctermfg=136 guibg=#586e75 ctermbg=60
     call leaderf#colorscheme#popup#link_two("Lf_hl_popupBorder", "Normal", "VertSplit", 1)
+    highlight def Lf_hl_popup_prompt       guifg=#073642 ctermfg=23  guibg=#fdf6e3 ctermbg=230  gui=bold cterm=bold
+    highlight def Lf_hl_popup_spin         guifg=#002b36 ctermfg=17  guibg=#fdf6e3 ctermbg=230
+    highlight def Lf_hl_popup_normalMode   guifg=#fdf6e3 ctermfg=230 guibg=#586e75 ctermbg=60   gui=bold cterm=bold
+    highlight def Lf_hl_popup_inputMode    guifg=#fdf6e3 ctermfg=230 guibg=#b58900 ctermbg=136  gui=bold cterm=bold
+    highlight def Lf_hl_popup_category     guifg=#eee8d5 ctermfg=224 guibg=#839496 ctermbg=102
+    highlight def Lf_hl_popup_nameOnlyMode guifg=#eee8d5 ctermfg=224 guibg=#268bd2 ctermbg=32
+    highlight def Lf_hl_popup_fullPathMode guifg=#eee8d5 ctermfg=224 guibg=#93a1a1 ctermbg=109
+    highlight def Lf_hl_popup_fuzzyMode    guifg=#eee8d5 ctermfg=224 guibg=#93a1a1 ctermbg=109
+    highlight def Lf_hl_popup_regexMode    guifg=#eee8d5 ctermfg=224 guibg=#dc322f ctermbg=166
+    highlight def Lf_hl_popup_cwd          guifg=#586e75 ctermfg=60  guibg=#eee8d5 ctermbg=224
+    highlight def Lf_hl_popup_lineInfo     guifg=#eee8d5 ctermfg=224 guibg=#839496 ctermbg=102
+    highlight def Lf_hl_popup_total        guifg=#fdf6e3 ctermfg=230 guibg=#586e75 ctermbg=60
 
-    highlight def Lf_hl_popup_prompt guifg=#c77400 guibg=NONE gui=NONE ctermfg=172 cterm=NONE
-    highlight def Lf_hl_popup_spin guifg=#f12d2d guibg=NONE gui=NONE ctermfg=196 cterm=NONE
-    highlight def Lf_hl_popup_normalMode guifg=#fbf1c7 guibg=#a89984 gui=bold ctermfg=230 ctermbg=137 cterm=bold
-    highlight def Lf_hl_popup_inputMode guifg=#808000 guibg=#f0e68c gui=bold ctermfg=100 ctermbg=186 cterm=bold
-    highlight def Lf_hl_popup_category guifg=#504945 guibg=#d5c4a1 gui=NONE ctermfg=239 ctermbg=187 cterm=NONE
-    highlight def Lf_hl_popup_nameOnlyMode guifg=#665c54 guibg=#e4d9c3 gui=NONE ctermfg=59 ctermbg=251 cterm=NONE
-    highlight def Lf_hl_popup_fullPathMode guifg=#665c54 guibg=#e4d9c3 gui=NONE ctermfg=59 ctermbg=251 cterm=NONE
-    highlight def Lf_hl_popup_fuzzyMode guifg=#665c54 guibg=#e4d9c3 gui=NONE ctermfg=59 ctermbg=251 cterm=NONE
-    highlight def Lf_hl_popup_regexMode guifg=#665c54 guibg=#e4d9c3 gui=NONE ctermfg=59 ctermbg=251 cterm=NONE
-    highlight def Lf_hl_popup_cwd guifg=#7c6f64 guibg=#faefb2 gui=NONE ctermfg=243 ctermbg=253 cterm=NONE
-    highlight def Lf_hl_popup_lineInfo guifg=#665c54 guibg=#e4d9c3 gui=NONE ctermfg=59 ctermbg=187 cterm=NONE
-    highlight def Lf_hl_popup_total guifg=#504945 guibg=#d5c4a1 gui=NONE ctermfg=239 ctermbg=186 cterm=NONE
+    highlight def Lf_hl_cursorline         guifg=#002b36 ctermfg=17
 
-
-    " the color of the cursorline
-    highlight def Lf_hl_cursorline guifg=#b57614 guibg=NONE gui=NONE ctermfg=172 cterm=NONE
-
-    " the color of matching character
-    highlight def Lf_hl_match guifg=#d65d0e guibg=NONE gui=bold ctermfg=166 cterm=bold
-
-    " the color of matching character in `And mode`
-    highlight def Lf_hl_match0 guifg=#d65d0e guibg=NONE gui=bold ctermfg=166 cterm=bold
-    highlight def Lf_hl_match1 guifg=#006bc2 guibg=NONE gui=bold ctermfg=25 cterm=bold
-    highlight def Lf_hl_match2 guifg=#b52bb0 guibg=NONE gui=bold ctermfg=127 cterm=bold
-    highlight def Lf_hl_match3 guifg=#ff7100 guibg=NONE gui=bold ctermfg=202 cterm=bold
-    highlight def Lf_hl_match4 guifg=#248888 guibg=NONE gui=bold ctermfg=30 cterm=bold
-
-    " the color of matching character in nameOnly mode when ';' is typed
-    highlight def Lf_hl_matchRefine guifg=#8f3f71 guibg=NONE gui=bold ctermfg=126 cterm=bold
+    highlight def Lf_hl_match              guifg=#b58900 ctermfg=136 guibg=NONE    ctermbg=NONE gui=bold cterm=bold
+    highlight def Lf_hl_match0             guifg=#d33682 ctermfg=168 guibg=NONE    ctermbg=NONE gui=bold cterm=bold
+    highlight def Lf_hl_match1             guifg=#6c71c4 ctermfg=62  guibg=NONE    ctermbg=NONE gui=bold cterm=bold
+    highlight def Lf_hl_match2             guifg=#268bd2 ctermfg=32  guibg=NONE    ctermbg=NONE gui=bold cterm=bold
+    highlight def Lf_hl_match3             guifg=#2aa198 ctermfg=36  guibg=NONE    ctermbg=NONE gui=bold cterm=bold
+    highlight def Lf_hl_match4             guifg=#859900 ctermfg=100 guibg=NONE    ctermbg=NONE gui=bold cterm=bold
+    highlight def Lf_hl_matchRefine        guifg=#cb4b16 ctermfg=166 guibg=NONE    ctermbg=NONE gui=bold cterm=bold
 
     " the color of help in normal mode when <F1> is pressed
     highlight def link Lf_hl_help               Comment
     highlight def link Lf_hl_helpCmd            Identifier
 
     " the color when select multiple lines
-    highlight def Lf_hl_selection guifg=#665c54 guibg=#a5eb84 gui=NONE ctermfg=59 ctermbg=156 cterm=NONE
+    highlight def Lf_hl_selection guifg=#4d4d4d guibg=#a5eb84 gui=NONE ctermfg=239 ctermbg=156 cterm=NONE
 
     " the color of `Leaderf buffer`
     highlight def link Lf_hl_bufNumber          Constant

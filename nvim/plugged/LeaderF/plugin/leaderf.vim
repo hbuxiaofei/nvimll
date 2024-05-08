@@ -32,10 +32,22 @@ endfunction
 call s:InitVar('g:Lf_ShortcutF', '<Leader>f')
 call s:InitVar('g:Lf_ShortcutB', '<Leader>b')
 call s:InitVar('g:Lf_WindowPosition', 'bottom')
-call s:InitVar('g:Lf_CacheDirectory', $HOME)
 call s:InitVar('g:Lf_MruBufnrs', [])
 call s:InitVar('g:Lf_PythonExtensions', {})
 call s:InitVar('g:Lf_PreviewWindowID', {})
+
+if has('win32') || has('win64')
+    let s:cache_dir = $APPDATA
+    if s:cache_dir == ''
+        let s:cache_dir = $HOME
+    endif
+else
+    let s:cache_dir = $XDG_CACHE_HOME
+    if s:cache_dir == ''
+        let s:cache_dir = $HOME . '/.cache'
+    endif
+endif
+call s:InitVar('g:Lf_CacheDirectory', s:cache_dir)
 
 function! g:LfNoErrMsgMatch(expr, pat)
     try
@@ -107,10 +119,12 @@ function! s:Normalize(filename)
     endif
 endfunction
 
-augroup LeaderF_Mru
-    autocmd BufAdd,BufEnter,BufWritePost * call lfMru#record(s:Normalize(expand('<afile>:p'))) |
-                \ call lfMru#recordBuffer(expand('<abuf>'))
-augroup END
+if get(g:, 'Lf_MruEnable', 1) == 1
+    augroup LeaderF_Mru
+        autocmd BufEnter,BufWritePost * call lfMru#record(s:Normalize(expand('<afile>:p'))) |
+                    \ call lfMru#recordBuffer(expand('<abuf>'))
+    augroup END
+endif
 
 augroup LeaderF_Gtags
     autocmd!
@@ -152,7 +166,7 @@ noremap <Plug>LeaderfRgBangCwordRegexNoBoundary   :<C-U><C-R>=leaderf#Rg#startCm
 noremap <Plug>LeaderfRgBangCwordRegexBoundary     :<C-U><C-R>=leaderf#Rg#startCmdline(0, 1, 1, 1)<CR>
 
 noremap <Plug>LeaderfRgWORDLiteralNoBoundary :<C-U><C-R>=leaderf#Rg#startCmdline(1, 0, 0, 0)<CR>
-noremap <Plug>LeaderfRgWORDLiteralBoundary   :<C-U><C-R>=leaderf#Rg#startCmdline(1, 0, 0, 1)<CR>
+noremap <Plug>LeaderfRgWORDLiteralBoundary   :<C-U><C-R>=leaderf#Rg#startCmdline(1, 0, 0, 0)<CR>
 noremap <Plug>LeaderfRgWORDRegexNoBoundary   :<C-U><C-R>=leaderf#Rg#startCmdline(1, 0, 1, 0)<CR>
 noremap <Plug>LeaderfRgWORDRegexBoundary     :<C-U><C-R>=leaderf#Rg#startCmdline(1, 0, 1, 1)<CR>
 
@@ -176,8 +190,8 @@ vnoremap <silent> <Plug>LeaderfGtagsReference :<C-U><C-R>=leaderf#Gtags#startCmd
 vnoremap <silent> <Plug>LeaderfGtagsSymbol :<C-U><C-R>=leaderf#Gtags#startCmdline(2, 1, 's')<CR><CR>
 vnoremap <silent> <Plug>LeaderfGtagsGrep :<C-U><C-R>=leaderf#Gtags#startCmdline(2, 1, 'g')<CR><CR>
 
-command! -bar -nargs=? -complete=dir LeaderfFile Leaderf file <q-args>
-command! -bar -nargs=? -complete=dir LeaderfFileFullScreen Leaderf file --fullScreen <q-args>
+command! -bar -nargs=* -complete=dir LeaderfFile Leaderf file <args>
+command! -bar -nargs=* -complete=dir LeaderfFileFullScreen Leaderf file --fullScreen <args>
 command! -bar -nargs=1 LeaderfFilePattern Leaderf file --input <args>
 command! -bar -nargs=0 LeaderfFileCword Leaderf file --cword
 
@@ -242,6 +256,9 @@ command! -bar -nargs=0 LeaderfWindow Leaderf window
 
 command! -bar -nargs=0 LeaderfQuickFix Leaderf quickfix
 command! -bar -nargs=0 LeaderfLocList  Leaderf loclist
+
+command! -bar -nargs=0 LeaderfGit           Leaderf git
+command! -bar -nargs=0 LeaderfGitSplitDiff  Leaderf git diff --current-file --side-by-side
 
 try
     if g:Lf_ShortcutF != ""
