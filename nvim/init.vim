@@ -40,6 +40,9 @@ call plug#end()
 
 set number
 
+" disable mouse
+set mouse=
+
 " enable syntax
 syntax enable
 syntax on
