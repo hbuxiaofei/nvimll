@@ -34,6 +34,7 @@ Plug 'deoplete-plugins/deoplete-jedi', { 'do': ':UpdateRemotePlugins' }
 Plug 'davidhalter/jedi-vim', { 'do': ':UpdateRemotePlugins' }
 
 Plug 'Shougo/deoplete-clangx', { 'do': ':UpdateRemotePlugins' }
+Plug 'octol/vim-cpp-enhanced-highlight', { 'do': ':UpdateRemotePlugins' }
 
 call plug#end()
 
