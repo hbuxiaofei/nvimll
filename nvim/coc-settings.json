@@ -1,0 +1,14 @@
+// https://users.rust-lang.org/t/rust-analyzer-unable-to-resolve-target-specific-module/63797
+
+// https://github.com/rust-analyzer/rust-analyzer/blob/master/editors/code/package.json
+{
+    // https://doc.rust-lang.org/rustc/platform-support.html
+    // x86_64-unknown-linux-gnu, aarch64-unknown-linux-gnu, riscv64gc-unknown-linux-gnu
+    "rust-analyzer.cargo.target": "aarch64-unknown-linux-gnu",
+
+    // This is required as `cargo check --all-targets` doesn't seem to work well
+    // on no-std crates, it generates false "duplicate lang item" errors.
+    "rust-analyzer.checkOnSave.allTargets": false
+
+    // "rust-analyzer.cargo.features": [...]
+}
