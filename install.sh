@@ -72,26 +72,6 @@ cp -rf nvim $INSTALL_HOME/.config/
 # install command
 install_ripgrep
 
-
-# install requirements
-echo -e "\033[32m- [Info] Start to install requirements\033[0m"
-
-if ! command -v pip3 >/dev/null 2>&1; then
-    echo -e "\033[33m- [Err] pip3: command not found\033[0m"
-    exit 1
-fi
-
-is_exist=$(pip3 list 2>/dev/null | grep ^pynvim)
-if [ x"$is_exist" == x ]; then
-    run_cmd="pip3 install pynvim"
-    $run_cmd
-    if [ $? -ne 0 ]; then
-        echo -e "\033[33m- [Err] $run_cmd error\033[0m"
-        exit 1
-    fi
-fi
-
-
 echo -e "\033[32m- [Info] Install successfully...\033[0m"
 
 exit 0

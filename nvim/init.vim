@@ -30,9 +30,6 @@ Plug 'tbodt/deoplete-tabnine', { 'do': './install.sh' }
 Plug 'deoplete-plugins/deoplete-go', { 'do': ':UpdateRemotePlugins' }
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 
-Plug 'deoplete-plugins/deoplete-jedi', { 'do': ':UpdateRemotePlugins' }
-Plug 'davidhalter/jedi-vim', { 'do': ':UpdateRemotePlugins' }
-
 Plug 'Shougo/deoplete-clangx', { 'do': ':UpdateRemotePlugins' }
 Plug 'octol/vim-cpp-enhanced-highlight', { 'do': ':UpdateRemotePlugins' }
 
@@ -93,10 +90,6 @@ let g:go_version_warning = 0
 let g:go_list_type = "quickfix"
 let g:go_list_height = 10
 autocmd FileType go nmap <C-[> <Plug>(go-implements)
-
-" jedi-vim
-let g:jedi#popup_on_dot = 0
-
 
 
 " airline
