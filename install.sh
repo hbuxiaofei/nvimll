@@ -74,7 +74,7 @@ install_ripgrep
 
 install_pynvim() {
     if command -v apt >/dev/null 2>&1; then
-        run_cmd="apt install python3-pynvim"
+        run_cmd="apt install python3-pynvim -y"
         $run_cmd
         if [ $? -ne 0 ]; then
             echo -e "\033[33m- [Err] $run_cmd error\033[0m"
