@@ -76,6 +76,9 @@ set laststatus=2
 set encoding=utf-8
 set fileencoding=utf-8
 
+" 将leader:'\' 设置为空格键
+let mapleader = " "
+
 " remove unwanted whitespace
 autocmd BufWritePre * call LLvimStripTrailingWhitespace()
 autocmd BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|else|exe "norm $"|endif|endif
