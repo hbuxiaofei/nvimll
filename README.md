@@ -11,33 +11,25 @@ This is a distribution of nvim plugins for linux
 
 Run `:PlugInstall` to install plugins, or `UpdateRemotePlugins` to update plugins.
 
-See `:help deoplete-options` for a complete list of options.
-
 
 ## Requirements
 
 ```shell
+# apt install python3-pynvim
+
+or
+
 # pip3 install pynvim
 ```
-
 
 ## Language Requirements
 
 - Rust
 ```shell
-# rustup toolchain add nightly   // maybe
-# rustup component add rust-src
-```
-
-- Golang
-```shell
-# go get github.com/nsf/gocode
-```
-
-- Python
-```shell
-# pip3 install jedi
+Open nvim and run :CocInstall coc-rust-analyzer
 ```
 
 - C/C++
-`clang` command
+```shell
+Open nvim and run :CocInstall coc-clangd
+```

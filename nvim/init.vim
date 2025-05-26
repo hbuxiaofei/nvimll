@@ -2,16 +2,20 @@ call plug#begin('~/.config/nvim/plugged')
 
 Plug 'll/ll.vim', { 'do': ':UpdateRemotePlugins' }
 
-Plug 'Shougo/neco-vim', { 'do': ':UpdateRemotePlugins' }
-
 Plug 'sickill/vim-monokai', { 'do': ':UpdateRemotePlugins' }
 Plug 'vim-airline/vim-airline', { 'do': ':UpdateRemotePlugins' }
 Plug 'majutsushi/tagbar', { 'do': ':UpdateRemotePlugins' }
 Plug 'preservim/nerdtree', { 'do': ':UpdateRemotePlugins' }
+
+" 高亮显示多个不同的单词, 使用 <Leader>k 高亮光标下的单词
 Plug 'lfv89/vim-interestingwords', { 'do': ':UpdateRemotePlugins' }
+
 " Plug 'jiangmiao/auto-pairs', { 'do': ':UpdateRemotePlugins' }
 Plug 'kien/ctrlp.vim', { 'do': ':UpdateRemotePlugins' }
+
+" 快速注释代码
 Plug 'preservim/nerdcommenter', { 'do': ':UpdateRemotePlugins' }
+
 Plug 'voldikss/vim-floaterm', { 'do': ':UpdateRemotePlugins' }
 Plug 'Yggdroot/LeaderF', { 'do': ':UpdateRemotePlugins' }
 Plug 'Yggdroot/LeaderF-marks', { 'do': ':UpdateRemotePlugins' }
