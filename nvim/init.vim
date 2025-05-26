@@ -19,7 +19,6 @@ Plug 'preservim/nerdcommenter', { 'do': ':UpdateRemotePlugins' }
 Plug 'voldikss/vim-floaterm', { 'do': ':UpdateRemotePlugins' }
 Plug 'Yggdroot/LeaderF', { 'do': ':UpdateRemotePlugins' }
 Plug 'Yggdroot/LeaderF-marks', { 'do': ':UpdateRemotePlugins' }
-Plug 'SirVer/ultisnips', { 'do': ':UpdateRemotePlugins' }
 Plug 'honza/vim-snippets', { 'do': ':UpdateRemotePlugins' }
 Plug 'terryma/vim-multiple-cursors', { 'do': ':UpdateRemotePlugins' }
 Plug 'tpope/vim-fugitive', { 'do': ':UpdateRemotePlugins' }
@@ -77,9 +76,6 @@ set fileencoding=utf-8
 autocmd BufWritePre * call LLvimStripTrailingWhitespace()
 autocmd BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|else|exe "norm $"|endif|endif
 
-" disable go version warning, this will happen when nvim version is too low
-let g:go_version_warning = 0
-
 " airline
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#buffer_nr_show = 1
@@ -135,11 +131,6 @@ let g:floaterm_height = 0.8
 nnoremap <silent> <F9> :FloatermToggle<CR>
 tnoremap <silent> <F9> <C-\><C-n>:FloatermToggle<CR>
 
-
-" ultisnips
-let g:UltiSnipsJumpForwardTrigger="<c-b>"
-
-
 " vim-multiple-cursors
 func! Multiple_cursors_before()
   if exists('g:AutoPairsLoaded')
@@ -164,11 +155,15 @@ nmap <silent> <F4> :cn<cr>
 "
 " weget https://nodejs.org/dist/v20.11.0/node-v20.11.0-linux-x64.tar.xz
 " tar -xf node-v20.11.0-linux-x64.tar.xz --strip-components 1 -C /usr/
+" xmap <leader>fm  <Plug>(coc-format-selected)
+" nmap <leader>fm  <Plug>(coc-format-selected)
 nmap <silent> gd <Plug>(coc-definition)
 nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
 inoremap <silent><expr> <cr> coc#pum#visible() ? coc#_select_confirm() : "\<C-g>u\<CR>"
+set pumheight=10
+
 
 " coc.nvim rust
 " wget https://github.com/rust-lang/rust-analyzer/releases/download/2024-01-29/rust-analyzer-x86_64-unknown-linux-gnu.gz
