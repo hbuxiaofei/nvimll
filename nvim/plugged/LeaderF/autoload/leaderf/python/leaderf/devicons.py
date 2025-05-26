@@ -85,7 +85,7 @@ fileNodesExtensionSymbols = {
         'el'         : '', 'jsonp'     : '', 'pyw'     : '',  'xml'         : '',
         'elm'        : '', 'jsx'       : '', 'rb'      : '',  'xul'         : '',
         'yaml'       : '', 'yaws'      : '', 'yml'     : '',  'zip'         : '',
-        'zsh'        : '', 'nix'       : '󱄅',
+        'zsh'        : '',
         }
 fileNodesExtensionSymbols.update(lfEval("get(g:, 'Lf_DevIconsExtensionSymbols', {})"))
 

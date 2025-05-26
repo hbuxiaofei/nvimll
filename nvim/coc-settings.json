@@ -11,4 +11,7 @@
     // "rust-analyzer.checkOnSave.allTargets": false
 
     // "rust-analyzer.cargo.features": [...]
+
+    "snippets.userSnippetsDirectory": "~/.config/nvim/plugged/vim-snippets/snippets"
+
 }

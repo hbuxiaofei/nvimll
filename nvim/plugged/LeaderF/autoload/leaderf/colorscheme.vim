@@ -14,8 +14,6 @@ endfunction
 let s:modeMap = {
             \   'NameOnly': 'Lf_hl_stlNameOnlyMode',
             \   'FullPath': 'Lf_hl_stlFullPathMode',
-            \   'Contents': 'Lf_hl_stlNameOnlyMode',
-            \   'WholeLine': 'Lf_hl_stlFullPathMode',
             \   'Fuzzy': 'Lf_hl_stlFuzzyMode',
             \   'Regex': 'Lf_hl_stlRegexMode',
             \   'Live': 'Lf_hl_stlFuzzyMode'

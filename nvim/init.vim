@@ -19,14 +19,18 @@ Plug 'preservim/nerdcommenter', { 'do': ':UpdateRemotePlugins' }
 Plug 'voldikss/vim-floaterm', { 'do': ':UpdateRemotePlugins' }
 Plug 'Yggdroot/LeaderF', { 'do': ':UpdateRemotePlugins' }
 Plug 'Yggdroot/LeaderF-marks', { 'do': ':UpdateRemotePlugins' }
-Plug 'honza/vim-snippets', { 'do': ':UpdateRemotePlugins' }
+
+" <C-n> 选择多个修改, <C-x> 跳过当前匹配
 Plug 'terryma/vim-multiple-cursors', { 'do': ':UpdateRemotePlugins' }
+
+" 所有 Git 命令都可以通过 :Git 命令或其简写 :G 来调用
 Plug 'tpope/vim-fugitive', { 'do': ':UpdateRemotePlugins' }
-Plug 'junegunn/gv.vim', { 'do': ':UpdateRemotePlugins' }
 
 Plug 'octol/vim-cpp-enhanced-highlight', { 'do': ':UpdateRemotePlugins' }
 
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'honza/vim-snippets', { 'do': ':UpdateRemotePlugins' }
+
 Plug 'rust-lang/rust.vim', { 'do': ':UpdateRemotePlugins' }
 
 call plug#end()
@@ -111,6 +115,7 @@ let g:ctrlp_match_window = 'min:1,max:15,results:100'
 
 " leaderf
 let g:Lf_CommandMap = {'<C-K>': ['<Up>'], '<C-J>': ['<Down>']}
+let g:Lf_WorkingDirectoryMode = 'Ac'
 let g:Lf_WindowPosition = 'popup'
 let g:Lf_PreviewInPopup = 1
 let g:Lf_PreviewResult = {'Rg':1 , 'Line': 1, 'Colorscheme': 1}
@@ -119,6 +124,7 @@ let g:Lf_ShortcutF = "<leader>ff"
 noremap <Leader>fa :<C-U><C-R>=printf("Leaderf rg -e \"%s\"", expand("<cword>"))<CR>
 noremap <Leader>fr :<C-U><C-R>=printf("Leaderf rg --all-buffers -e \"%s\"", expand("<cword>"))<CR>
 noremap <leader>fl :<C-U><C-R>=printf("LeaderfLine")<CR><CR>
+noremap <leader>fm :<C-U><C-R>=printf("LeaderfMarks")<CR><CR>
 
 
 " nerdcommenter

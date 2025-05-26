@@ -65,10 +65,6 @@ let g:Lf_Helps = {
             \ "quickfix":       "navigate quickfix",
             \ "loclist":        "navigate location list",
             \ "jumps":          "navigate jumps list",
-            \ "git":            "use git",
-            \ "git-log":        "show the commit logs",
-            \ "git-diff":       "show changes between commits, commit and working tree, etc",
-            \ "git-blame":      "show what revision and author last modified each line of a file",
             \ }
 
 let g:Lf_Arguments = {
@@ -215,50 +211,6 @@ let g:Lf_Arguments = {
             \ "quickfix": [],
             \ "loclist": [],
             \ "jumps": [],
-            \ "git":{
-            \       "log": [
-            \           {"name": ["--current-file"], "nargs": 0, "help": "show logs of current file"},
-            \           [
-            \               {"name": ["--directly"], "nargs": 0, "help": "output the logs directly"},
-            \               {"name": ["--explorer"], "nargs": 0, "help": "view changed files of one commit in a tree explorer"},
-            \           ],
-            \           {"name": ["--position"], "nargs": 1, "choices": ["top", "right", "bottom", "left"], "metavar": "<POSITION>",
-            \               "help": "specifies the position of the logs window"},
-            \           {"name": ["--navigation-position"], "nargs": 1, "choices": ["top", "right", "bottom", "left"], "metavar": "<POSITION>",
-            \               "help": "specifies the position of the navigation panel"},
-            \           {"name": ["-n", "--max-count"], "nargs": 1, "metavar": "<number>", "help": "Limit the number of commits to output."},
-            \           {"name": ["--skip"], "nargs": 1, "metavar": "<number>", "help": "Skip number commits before starting to show the commit output."},
-            \           {"name": ["--since", "--after"], "nargs": 1, "metavar": "<date>", "help": "Show commits more recent than a specific date."},
-            \           {"name": ["--until", "--before"], "nargs": 1, "metavar": "<date>", "help": "Show commits older than a specific date."},
-            \           {"name": ["--author"], "nargs": 1, "metavar": "<pattern>", "help": "Limit the commits output to ones with author header lines that match the specified pattern (regular expression)."},
-            \           {"name": ["--committer"], "nargs": 1, "metavar": "<pattern>", "help": "Limit the commits output to ones with committer header lines that match the specified pattern (regular expression)."},
-            \           {"name": ["--no-merges"], "nargs": 0, "help": "Do not print commits with more than one parent."},
-            \           {"name": ["--all"], "nargs": 0, "help": "Pretend as if all the refs in refs/, along with HEAD, are listed on the command line as <commit>."},
-            \           {"name": ["--graph"], "nargs": 0, "help": "Draw a text-based graphical representation of the commit history on the left hand side of the output."},
-            \           {"name": ["--reverse-order"], "nargs": 0, "help": "Output the commits chosen to be shown in reverse order."},
-            \           {"name": ["--find-copies-harder"], "nargs": 0, "help": "This flag makes the command inspect unmodified files as candidates for the source of copy."},
-            \           {"name": ["extra"], "nargs": "*", "help": "extra arguments of git log"},
-            \       ],
-            \       "diff": [
-            \           {"name": ["--cached", "--staged"], "nargs": 0, "help": "run 'git diff --cached'"},
-            \           [
-            \               {"name": ["--directly"], "nargs": 0, "help": "output the diffs directly"},
-            \               {"name": ["--explorer"], "nargs": 0, "help": "view changed files in a tree explorer"},
-            \           ],
-            \           {"name": ["--position"], "nargs": 1, "choices": ["top", "right", "bottom", "left"], "metavar": "<POSITION>",
-            \               "help": "specifies the position of the diffs window"},
-            \           {"name": ["--navigation-position"], "nargs": 1, "choices": ["top", "right", "bottom", "left"], "metavar": "<POSITION>",
-            \               "help": "specifies the position of the navigation panel"},
-            \           {"name": ["-s", "--side-by-side"], "nargs": 0, "help": "show diffs in a side-by-side view"},
-            \           {"name": ["--current-file"], "nargs": 0, "help": "show diffs of current file"},
-            \           {"name": ["extra"], "nargs": "*", "help": "extra arguments of git diff"},
-            \       ],
-            \       "blame": [
-            \           {"name": ["-w"], "nargs": 0, "help": "Ignore whitespace when comparing the parent’s version and the child’s to find where the lines came from."},
-            \           {"name": ["--date"], "nargs": 1, "choices": ["relative", "local", "iso", "iso-strict", "rfc", "short", "human", "default"],
-            \               "metavar": "<format>", "help": "Specifies the format used to output dates. .i.e, git blame --date=<format>. <format> can be one of ['relative', 'local', 'iso', 'iso-strict', 'rfc', 'short', 'human', 'default']"},
-            \       ],
-            \   },
             \}
 
 let g:Lf_CommonArguments = [
@@ -394,21 +346,6 @@ function! leaderf#Any#parseArguments(argLead, cmdline, cursorPos) abort
         else
             let arguments = []
         endif
-
-        if type(arguments) == type({})
-            if argNum == 2 || argNum == 3 && a:argLead != ""
-                return filter(keys(arguments), "s:Lf_FuzzyMatch(a:argLead, v:val)")
-            else
-                let arguments = arguments[argList[2]]
-            endif
-        endif
-
-        if argNum > 3 && argList[1] == "git" && argList[2] == "blame"
-            if get(existingOptions, -1, "") == "--date"
-                return ["relative", "local", "iso", "iso-strict", "rfc", "short", "human", "default"]
-            endif
-        endif
-
         let argDict = s:Lf_GenDict(arguments + g:Lf_CommonArguments)
         for opt in s:Lf_Refine(arguments + g:Lf_CommonArguments)
             if type(opt) == type([])

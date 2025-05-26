@@ -279,11 +279,8 @@ class Manager(object):
         elif self._cli._is_live:
             mode = 'Fuzzy'
 
-        self.setStlMode(mode)
-        self._cli.setCurrentMode(mode)
-
-    def setStlMode(self, mode):
         self._getInstance().setStlMode(mode)
+        self._cli.setCurrentMode(mode)
 
     def _beforeEnter(self):
         self._resetAutochdir()
@@ -411,11 +408,11 @@ class Manager(object):
         if lfEval("has('nvim')") == '1':
             if self._preview_winid:
                 if int(lfEval("nvim_win_is_valid(%d) == v:true" % self._preview_winid)):
-                    lfCmd("call nvim_win_close(%d, 1)" % self._preview_winid)
+                    lfCmd("noautocmd call nvim_win_close(%d, 1)" % self._preview_winid)
                 self._preview_winid = 0
         else:
             if self._preview_winid:
-                lfCmd("call popup_close(%d)" % self._preview_winid)
+                lfCmd("noautocmd call popup_close(%d)" % self._preview_winid)
                 self._preview_winid = 0
 
         self._preview_filetype = None
@@ -851,7 +848,7 @@ class Manager(object):
             lfPrintError(e)
             return True
 
-    def setOptionsForCursor(self):
+    def _useExistingWindow(self, title, source, line_num, jump_cmd):
         preview_pos = self._arguments.get("--preview-position", [""])[0]
         if preview_pos == "":
             preview_pos = lfEval("get(g:, 'Lf_PreviewPosition', 'top')")
@@ -865,9 +862,6 @@ class Manager(object):
                 lfCmd("call nvim_win_set_config(%d, %s)" % (self._preview_winid, str(self._preview_config)))
             else:
                 lfCmd("call popup_setoptions(%d, %s)" % (self._preview_winid, str(self._preview_config)))
-
-    def _useExistingWindow(self, title, source, line_num, jump_cmd):
-        self.setOptionsForCursor()
 
         if self._orig_source != source:
             self._orig_source = source
@@ -1749,7 +1743,7 @@ class Manager(object):
                                             pattern=pattern, is_name_only=True, sort_results=do_sort)
                     getHighlights = partial(fuzzyEngine.getHighlights, engine=self._fuzzy_engine,
                                             pattern=pattern, is_name_only=True)
-                    highlight_method = partial(self._highlight, False, getHighlights, True)
+                    highlight_method = partial(self._highlight, True, getHighlights, True)
                 elif is_fuzzyMatch_C and isAscii(self._cli.pattern[0]):
                     use_fuzzy_match_c = True
                     pattern = fuzzyMatchC.initPattern(self._cli.pattern[0])
@@ -1841,7 +1835,7 @@ class Manager(object):
                                                 is_name_only=True, sort_results=do_sort)
                 elif self._getExplorer().getStlCategory() == "Rg":
                     return_index = False
-                    if self._cli.isFullPath or "--match-path" in self._arguments:
+                    if "--match-path" in self._arguments:
                         filter_method = partial(fuzzyEngine.fuzzyMatch, engine=self._fuzzy_engine, pattern=pattern,
                                                 is_name_only=True, sort_results=do_sort)
                     else:
@@ -1872,12 +1866,6 @@ class Manager(object):
                     filter_method = partial(fuzzyEngine.fuzzyMatchPart, engine=self._fuzzy_engine,
                                             pattern=pattern, category=fuzzyEngine.Category_Line,
                                             param=fuzzyEngine.createParameter(1), is_name_only=True, sort_results=do_sort)
-                elif self._getExplorer().getStlCategory() == "Git_diff":
-                    return_index = False
-                    mode = 0 if self._cli.isFullPath else 1
-                    filter_method = partial(fuzzyEngine.fuzzyMatchPart, engine=self._fuzzy_engine,
-                                            pattern=pattern, category=fuzzyEngine.Category_GitDiff,
-                                            param=fuzzyEngine.createParameter(mode), is_name_only=False, sort_results=do_sort)
                 elif self._getExplorer().getStlCategory() in ["Self", "Buffer", "Mru", "BufTag",
                         "Function", "History", "Cmd_History", "Search_History", "Filetype",
                         "Command", "Window", "QuickFix", "LocList"]:
@@ -2286,7 +2274,13 @@ class Manager(object):
             self._cursorline_dict.clear()
             self._issue_422_set_option()
             if mode == 't' and len(vim.tabpages) > tabpage_count:
-                tabmove()
+                tab_pos = int(lfEval("g:Lf_TabpagePosition"))
+                if tab_pos == 0:
+                    lfCmd("tabm 0")
+                elif tab_pos == 1:
+                    lfCmd("tabm -1")
+                elif tab_pos == 3:
+                    lfCmd("tabm")
 
     def accept(self, mode=''):
         if self._getInstance().isReverseOrder():

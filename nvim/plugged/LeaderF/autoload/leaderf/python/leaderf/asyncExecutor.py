@@ -21,7 +21,7 @@ class AsyncExecutor(object):
     read the output asynchronously.
     """
     def __init__(self):
-        self._errQueue = None
+        self._errQueue = Queue.Queue()
         self._process = None
         self._finished = False
         self._max_count = int(lfEval("g:Lf_MaxCount"))
@@ -54,7 +54,6 @@ class AsyncExecutor(object):
                                              env=env,
                                              universal_newlines=False)
 
-        self._errQueue = Queue.Queue()
         self._finished = False
 
         stderr_thread = threading.Thread(target=self._readerThread,
@@ -103,7 +102,7 @@ class AsyncExecutor(object):
 
                     err = b"".join(iter(self._errQueue.get, None))
                     if err and raise_except:
-                        raise Exception(cmd + "\n" + lfBytes2Str(err) + lfBytes2Str(err, encoding))
+                        raise Exception(lfBytes2Str(err) + lfBytes2Str(err, encoding))
                 except ValueError:
                     pass
                 finally:
