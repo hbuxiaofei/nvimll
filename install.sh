@@ -72,6 +72,38 @@ cp -rf nvim $INSTALL_HOME/.config/
 # install command
 install_ripgrep
 
-echo -e "\033[32m- [Info] Install successfully...\033[0m"
+install_pynvim() {
+    if command -v apt >/dev/null 2>&1; then
+        run_cmd="apt install python3-pynvim"
+        $run_cmd
+        if [ $? -ne 0 ]; then
+            echo -e "\033[33m- [Err] $run_cmd error\033[0m"
+            exit 1
+        else
+            return 0
+        fi
+    fi
+
+    if command -v pip3 >/dev/null 2>&1; then
+        run_cmd="pip3 install pynvim"
+        $run_cmd
+        if [ $? -ne 0 ]; then
+            echo -e "\033[33m- [Err] $run_cmd error\033[0m"
+            exit 1
+        else
+            return 0
+        fi
+    fi
+}
+
+# install requirements
+echo -e "\033[32m- [Info] Start to install requirements\033[0m"
+
+python3 -c "import pynvim" >/dev/null 2>&1
+[ $? -ne 0 ] && install_pynvim
+
+echo -e "\033[32m- [Info] Install successfully\033[0m"
+
+echo -e "\033[32m- [Info] Please open nvim and run :CocInstall coc-rust-analyzer \033[0m"
 
 exit 0
