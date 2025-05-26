@@ -2,7 +2,6 @@ call plug#begin('~/.config/nvim/plugged')
 
 Plug 'll/ll.vim', { 'do': ':UpdateRemotePlugins' }
 
-Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'Shougo/neco-vim', { 'do': ':UpdateRemotePlugins' }
 
 Plug 'sickill/vim-monokai', { 'do': ':UpdateRemotePlugins' }
@@ -12,7 +11,6 @@ Plug 'preservim/nerdtree', { 'do': ':UpdateRemotePlugins' }
 Plug 'lfv89/vim-interestingwords', { 'do': ':UpdateRemotePlugins' }
 " Plug 'jiangmiao/auto-pairs', { 'do': ':UpdateRemotePlugins' }
 Plug 'kien/ctrlp.vim', { 'do': ':UpdateRemotePlugins' }
-Plug 'skywind3000/asyncrun.vim', { 'do': ':UpdateRemotePlugins' }
 Plug 'preservim/nerdcommenter', { 'do': ':UpdateRemotePlugins' }
 Plug 'voldikss/vim-floaterm', { 'do': ':UpdateRemotePlugins' }
 Plug 'Yggdroot/LeaderF', { 'do': ':UpdateRemotePlugins' }
@@ -23,15 +21,10 @@ Plug 'terryma/vim-multiple-cursors', { 'do': ':UpdateRemotePlugins' }
 Plug 'tpope/vim-fugitive', { 'do': ':UpdateRemotePlugins' }
 Plug 'junegunn/gv.vim', { 'do': ':UpdateRemotePlugins' }
 
+Plug 'octol/vim-cpp-enhanced-highlight', { 'do': ':UpdateRemotePlugins' }
+
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'rust-lang/rust.vim', { 'do': ':UpdateRemotePlugins' }
-Plug 'tbodt/deoplete-tabnine', { 'do': './install.sh' }
-
-Plug 'deoplete-plugins/deoplete-go', { 'do': ':UpdateRemotePlugins' }
-Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
-
-Plug 'Shougo/deoplete-clangx', { 'do': ':UpdateRemotePlugins' }
-Plug 'octol/vim-cpp-enhanced-highlight', { 'do': ':UpdateRemotePlugins' }
 
 call plug#end()
 
@@ -80,17 +73,8 @@ set fileencoding=utf-8
 autocmd BufWritePre * call LLvimStripTrailingWhitespace()
 autocmd BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|else|exe "norm $"|endif|endif
 
-" enable deoplete
-let g:deoplete#enable_at_startup = 1
-
 " disable go version warning, this will happen when nvim version is too low
 let g:go_version_warning = 0
-
-" vim-go
-let g:go_list_type = "quickfix"
-let g:go_list_height = 10
-autocmd FileType go nmap <C-[> <Plug>(go-implements)
-
 
 " airline
 let g:airline#extensions#tabline#enabled = 1
@@ -157,20 +141,11 @@ func! Multiple_cursors_before()
   if exists('g:AutoPairsLoaded')
     call AutoPairsToggle()
   end
-  if deoplete#is_enabled()
-    call deoplete#disable()
-    let g:deoplete_is_enable_before_multi_cursors = 1
-  else
-    let g:deoplete_is_enable_before_multi_cursors = 0
-  endif
 endfunc
 func! Multiple_cursors_after()
   if exists('g:AutoPairsLoaded')
     call AutoPairsToggle()
   end
-  if g:deoplete_is_enable_before_multi_cursors
-    call deoplete#enable()
-  endif
 endfunc
 
 
@@ -179,10 +154,6 @@ nmap <silent> <leader><F6> :call LLvimLQlistToggle("Location List", 'l')<CR>
 nmap <silent> <F6> :call LLvimLQlistToggle("Quickfix List", 'c')<CR>
 nmap <silent> <F3> :cp<cr>
 nmap <silent> <F4> :cn<cr>
-
-" asyncrun
-let g:asyncrun_open=10
-autocmd BufRead,BufNewFile *.go let g:asyncrun_raw = 1
 
 " coc.nvim
 " all coc extensions: https://github.com/neoclide/coc.nvim/wiki/Using-coc-extensions
@@ -202,9 +173,3 @@ inoremap <silent><expr> <cr> coc#pum#visible() ? coc#_select_confirm() : "\<C-g>
 " coc.nvim c++
 " wget https://github.com/clangd/clangd/releases/download/18.1.3/clangd-linux-18.1.3.zip
 " nvim -> :CocInstall coc-clangd
-
-" deoplete-tabnine
-" https://areweideyet.com
-" https://www.tabnine.com
-" https://github.com/codota/TabNine
-call deoplete#custom#var('tabnine', {'line_limit': 100, 'max_num_results': 5})
