@@ -16,7 +16,9 @@ Plug 'kien/ctrlp.vim', { 'do': ':UpdateRemotePlugins' }
 " 快速注释代码
 Plug 'preservim/nerdcommenter', { 'do': ':UpdateRemotePlugins' }
 
+Plug 'MattesGroeger/vim-bookmarks', { 'do': ':UpdateRemotePlugins' }
 Plug 'voldikss/vim-floaterm', { 'do': ':UpdateRemotePlugins' }
+
 Plug 'Yggdroot/LeaderF', { 'do': ':UpdateRemotePlugins' }
 Plug 'Yggdroot/LeaderF-marks', { 'do': ':UpdateRemotePlugins' }
 
@@ -129,6 +131,12 @@ noremap <Leader>fr :<C-U><C-R>=printf("Leaderf rg --all-buffers -e \"%s\"", expa
 noremap <leader>fl :<C-U><C-R>=printf("LeaderfLine")<CR><CR>
 noremap <leader>fm :<C-U><C-R>=printf("LeaderfMarks")<CR><CR>
 
+" vim-bookmarks
+let g:bookmark_no_default_key_mappings = 1
+nmap <Leader>mm <Plug>BookmarkToggle
+nmap <Leader>mi <Plug>BookmarkAnnotate
+nmap <Leader>ma <Plug>BookmarkShowAll
+nmap <Leader>mx <Plug>BookmarkClearAll
 
 " nerdcommenter
 let g:NERDSpaceDelims = 1
