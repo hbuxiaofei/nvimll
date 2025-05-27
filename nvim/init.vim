@@ -133,6 +133,8 @@ noremap <leader>fm :<C-U><C-R>=printf("LeaderfMarks")<CR><CR>
 
 " vim-bookmarks
 let g:bookmark_no_default_key_mappings = 1
+let g:bookmark_show_toggle_warning = 0
+let g:bookmark_save_per_working_dir = 1
 nmap <Leader>mm <Plug>BookmarkToggle
 nmap <Leader>mi <Plug>BookmarkAnnotate
 nmap <Leader>ma <Plug>BookmarkShowAll
