@@ -172,8 +172,8 @@ nmap <silent> <F4> :cn<cr>
 " coc.nvim
 " all coc extensions: https://github.com/neoclide/coc.nvim/wiki/Using-coc-extensions
 "
-" weget https://nodejs.org/dist/v20.11.0/node-v20.11.0-linux-x64.tar.xz
-" tar -xf node-v20.11.0-linux-x64.tar.xz --strip-components 1 -C /usr/
+" wget https://nodejs.org/dist/v22.16.0/node-v22.16.0-linux-x64.tar.xz
+" tar -xf node-v22.16.0-linux-x64.tar.xz --strip-components 1 -C /usr/
 " xmap <leader>fm  <Plug>(coc-format-selected)
 " nmap <leader>fm  <Plug>(coc-format-selected)
 nmap <silent> gd <Plug>(coc-definition)
