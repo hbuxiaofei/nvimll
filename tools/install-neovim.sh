@@ -3,7 +3,7 @@
 cd $(dirname $0)
 
 # https://github.com/neovim/neovim/releases
-neovim_name="nvim-linux64"
+neovim_name="nvim-linux-x86_64"
 neovim_tarball="${neovim_name}.tar.gz"
 neovim_url="https://github.com/neovim/neovim/releases/download/stable/${neovim_tarball}"
 
