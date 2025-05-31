@@ -128,6 +128,11 @@ endfunction
 command! -nargs=* Annotate call CallDeprecatedCommand('BookmarkAnnotate', [<q-args>, 0])
 command! -nargs=* BookmarkAnnotate call BookmarkAnnotate(<q-args>, 0)
 
+function! BookmarkString()
+  call bm#location_string()
+endfunction
+command! BookmarkString call BookmarkString()
+
 function! BookmarkClear()
   call s:refresh_line_numbers()
   let file = expand("%:p")
@@ -174,7 +179,7 @@ function! BookmarkPrev()
 endfunction
 command! PrevBookmark call CallDeprecatedCommand('BookmarkPrev')
 command! BookmarkPrev call BookmarkPrev()
-command! CtrlPBookmark call ctrlp#init(ctrlp#bookmarks#id()) 
+command! CtrlPBookmark call ctrlp#init(ctrlp#bookmarks#id())
 
 function! BookmarkShowAll()
   if s:is_quickfix_win()
@@ -419,7 +424,7 @@ function! s:refresh_line_numbers()
 endfunction
 
 function! s:bookmark_add(file, line_nr, ...)
-  let annotation = (a:0 ==# 1) ? a:1 : ""
+  let annotation = (a:0 ==# 1) ? a:1 : getline(a:line_nr)
   let sign_idx = bm_sign#add(a:file, a:line_nr, annotation !=# "")
   call bm#add_bookmark(a:file, sign_idx, a:line_nr, getline(a:line_nr), annotation)
 endfunction

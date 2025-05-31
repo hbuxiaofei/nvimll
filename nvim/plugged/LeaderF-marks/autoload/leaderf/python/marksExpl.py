@@ -18,7 +18,14 @@ class MarksExplorer(Explorer):
 
     def getContent(self, *args, **kwargs):
         result = lfEval("execute('marks', 'silent')")
-        return result.splitlines()[2:]
+        ret = result.splitlines()[2:]
+
+        if vim.eval(f'exists(":BookmarkString")') != '0':
+            bm_result = lfEval("execute('BookmarkString', 'silent')")
+            if len(bm_result.strip()) > 0:
+                ret = bm_result.splitlines()[1:]
+
+        return ret
 
     def getStlCategory(self):
         return "Marks"
@@ -45,7 +52,12 @@ class MarksExplManager(Manager):
             return
         line = args[0]
         cmd = line.split(None, 1)[0]
-        lfCmd("norm! `" + cmd)
+        if cmd.strip() == "-":
+            line_nr = line.split(None, 2)[1]
+            filepath = line.split()[-1]
+            lfCmd("silent! :e +" + line_nr + " " + filepath)
+        else:
+            lfCmd("norm! `" + cmd)
         lfCmd("norm! zz")
         lfCmd("setlocal cursorline! | redraw | sleep 100m | setlocal cursorline!")
 
@@ -111,7 +123,13 @@ class MarksExplManager(Manager):
             return
 
         line = args[0]
-        cmd = "silent! norm! `" + line.split(None, 1)[0]
+        cmd = line.split(None, 1)[0]
+        if cmd.strip() == "-":
+            line_nr = line.split(None, 2)[1]
+            filepath = line.split()[-1]
+            cmd = "silent! :e +" + line_nr + " " + filepath
+        else:
+            cmd = "silent! norm! `" + cmd
 
         saved_eventignore = vim.options['eventignore']
         vim.options['eventignore'] = 'BufWinEnter'

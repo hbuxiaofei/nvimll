@@ -24,7 +24,7 @@ function! bm#get_bookmark_by_line(file, line_nr)
 endfunction
 
 function! bm#is_bookmark_has_annotation_by_line(file, line_nr)
-  return g:line_map[a:file][a:line_nr]['annotation'] !=# "" 
+  return g:line_map[a:file][a:line_nr]['annotation'] !=# ""
 endfunction
 
 function! bm#get_bookmark_by_sign(file, sign_idx)
@@ -148,6 +148,25 @@ function! bm#location_list()
   return locations
 endfunction
 
+function! bm#location_string()
+  let files = sort(bm#all_files())
+  let strings = []
+  for file in files
+    let line_nrs = sort(bm#all_lines(file), "bm#compare_lines")
+    for line_nr in line_nrs
+      let bookmark = bm#get_bookmark_by_line(file, line_nr)
+      let content = bookmark['annotation'] !=# ''
+            \ ? bookmark['annotation']
+            \ : (bookmark['content'] !=# ""
+            \   ? bookmark['content']
+            \   : "empty line")
+      let rel_path = fnamemodify(file, ':.')
+      call add(strings, "-\t" . line_nr . "\t". bookmark['sign_idx']. "\t" . trim(content) . " | " . rel_path)
+    endfor
+  endfor
+  echo join(strings, "\n")
+endfunction
+
 function! bm#all_files()
   return keys(g:line_map)
 endfunction
@@ -185,7 +204,7 @@ function! bm#deserialize(data)
     for file in keys(ses)
       for bm in ses[file]
         let annotation = has_key(bm, 'annotation') ? bm['annotation'] : ''
-         call add(result, 
+         call add(result,
             \ extend(
               \ copy(
                 \ bm#add_bookmark(file, bm['sign_idx'], bm['line_nr'], bm['content'], annotation)

@@ -20,7 +20,7 @@ Plug 'MattesGroeger/vim-bookmarks', { 'do': ':UpdateRemotePlugins' }
 Plug 'voldikss/vim-floaterm', { 'do': ':UpdateRemotePlugins' }
 
 Plug 'Yggdroot/LeaderF', { 'do': ':UpdateRemotePlugins' }
-" Plug 'Yggdroot/LeaderF-marks', { 'do': ':UpdateRemotePlugins' }
+Plug 'Yggdroot/LeaderF-marks', { 'do': ':UpdateRemotePlugins' }
 
 " <C-n> 选择多个修改, <C-x> 跳过当前匹配
 Plug 'terryma/vim-multiple-cursors', { 'do': ':UpdateRemotePlugins' }
@@ -129,6 +129,7 @@ let g:Lf_ShortcutF = "<leader>ff"
 noremap <Leader>fa :<C-U><C-R>=printf("Leaderf rg -e \"%s\"", expand("<cword>"))<CR>
 noremap <Leader>fr :<C-U><C-R>=printf("Leaderf rg --all-buffers -e \"%s\"", expand("<cword>"))<CR>
 noremap <leader>fl :<C-U><C-R>=printf("LeaderfLine")<CR><CR>
+noremap <leader>fm :<C-U><C-R>=printf("LeaderfMarks")<CR><CR>
 
 " vim-bookmarks
 let g:bookmark_no_default_key_mappings = 1

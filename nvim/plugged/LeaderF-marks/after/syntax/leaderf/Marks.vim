@@ -10,5 +10,7 @@
 scriptencoding utf-8
 
 highlight def link Lf_hl_marksTitle         Title
-highlight def link Lf_hl_marksLineCol       Constant
-highlight def link Lf_hl_marksText          Comment
+" highlight def link Lf_hl_marksLineCol       Constant
+" highlight def link Lf_hl_marksText          Comment
+highlight def link Lf_hl_marksLineCol       Comment
+highlight def link Lf_hl_marksText          Constant
