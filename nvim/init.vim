@@ -45,7 +45,6 @@ set mouse=
 
 " enable syntax
 syntax enable
-syntax on
 
 " highlight current line
 set cursorline
