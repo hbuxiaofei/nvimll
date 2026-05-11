@@ -87,9 +87,9 @@ autocmd BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '
 " airline
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#buffer_nr_show = 1
-nmap <leader>- <Plug>AirlineSelectPrevTab
-nmap <leader>= <Plug>AirlineSelectNextTab
-nmap <silent> <leader>+ :call LLvimAirlineBufferClose()<CR>
+nmap - <Plug>AirlineSelectPrevTab
+nmap = <Plug>AirlineSelectNextTab
+nmap <silent> + :call LLvimAirlineBufferClose()<CR>
 
 
 " tagbar
@@ -184,7 +184,7 @@ set pumheight=10
 
 
 " coc.nvim rust
-" wget https://github.com/rust-lang/rust-analyzer/releases/download/2024-01-29/rust-analyzer-x86_64-unknown-linux-gnu.gz
+" wget https://github.com/rust-lang/rust-analyzer/releases/download/2026-05-11/rust-analyzer-x86_64-unknown-linux-gnu.gz
 " nvim -> :CocInstall coc-rust-analyzer
 
 " coc.nvim c++
