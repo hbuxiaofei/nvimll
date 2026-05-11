@@ -84,6 +84,11 @@ let mapleader = " "
 autocmd BufWritePre * call LLvimStripTrailingWhitespace()
 autocmd BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|else|exe "norm $"|endif|endif
 
+noremap <Select> <End>
+noremap <Find> <Home>
+noremap! <Select> <End>
+noremap! <Find> <Home>
+
 " airline
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#buffer_nr_show = 1
