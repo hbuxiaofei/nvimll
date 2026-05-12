@@ -23,7 +23,7 @@ Plug 'Yggdroot/LeaderF', { 'do': ':UpdateRemotePlugins' }
 Plug 'Yggdroot/LeaderF-marks', { 'do': ':UpdateRemotePlugins' }
 
 " <C-n> 选择多个修改, <C-x> 跳过当前匹配
-Plug 'terryma/vim-multiple-cursors', { 'do': ':UpdateRemotePlugins' }
+" Plug 'terryma/vim-multiple-cursors', { 'do': ':UpdateRemotePlugins' }
 
 " 所有 Git 命令都可以通过 :Git 命令或其简写 :G 来调用
 Plug 'tpope/vim-fugitive', { 'do': ':UpdateRemotePlugins' }
@@ -180,6 +180,8 @@ nmap <silent> <F4> :cn<cr>
 " tar -xf node-v22.16.0-linux-x64.tar.xz --strip-components 1 -C /usr/
 " xmap <leader>fm  <Plug>(coc-format-selected)
 " nmap <leader>fm  <Plug>(coc-format-selected)
+let $PATH = $HOME . '/.config/nodejs/bin:' . $PATH
+let g:coc_node_path = $HOME . '/.config/nodejs/bin/node'
 nmap <silent> gd <Plug>(coc-definition)
 nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)

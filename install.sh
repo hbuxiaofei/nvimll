@@ -45,6 +45,22 @@ install_ripgrep()
     fi
 }
 
+install_neovim()
+{
+    if command -v dpkg >/dev/null 2>&1; then
+        dpkg -s neovim >/dev/null 2>&1 && apt remove --purge neovim -y
+        dpkg -s neovim-runtime >/dev/null 2>&1 && apt remove --purge neovim-runtime -y
+    elif command -v rpm >/dev/null 2>&1; then
+        rpm -q neovim >/dev/null 2>&1 && rpm -e neovim
+    fi
+    bash tools/install-neovim.sh
+}
+
+install_nodejs()
+{
+    bash tools/install-nodejs.sh
+}
+
 # prepare
 if [ -d $INSTALL_HOME/.local/share/nvim/site/autoload ]; then
 	rm -rf $INSTALL_HOME/.local/share/nvim/site/autoload
@@ -71,10 +87,23 @@ cp -rf nvim $INSTALL_HOME/.config/
 
 # install command
 install_ripgrep
+install_neovim
+install_nodejs
 
 install_pynvim() {
     if command -v apt >/dev/null 2>&1; then
         run_cmd="apt install python3-pynvim -y"
+        $run_cmd
+        if [ $? -ne 0 ]; then
+            echo -e "\033[33m- [Err] $run_cmd error\033[0m"
+            exit 1
+        else
+            return 0
+        fi
+    fi
+
+    if command -v yum >/dev/null 2>&1; then
+        run_cmd="yum install python3-neovim -y"
         $run_cmd
         if [ $? -ne 0 ]; then
             echo -e "\033[33m- [Err] $run_cmd error\033[0m"
@@ -96,13 +125,10 @@ install_pynvim() {
     fi
 }
 
-# install requirements
-echo -e "\033[32m- [Info] Start to install requirements\033[0m"
-
 python3 -c "import pynvim" >/dev/null 2>&1
 [ $? -ne 0 ] && install_pynvim
 
-echo -e "\033[32m- [Info] Install successfully\033[0m"
+echo -e "\033[32m- [Info] Install successfully ...\033[0m"
 
 if [ ! -d $INSTALL_HOME/.config/coc/extensions/node_modules/coc-rust-analyzer ]; then
     echo -e "\033[33m- [Info] Please open nvim and run :CocInstall coc-rust-analyzer \033[0m"

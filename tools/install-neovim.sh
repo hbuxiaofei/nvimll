@@ -3,9 +3,11 @@
 cd $(dirname $0)
 
 # https://github.com/neovim/neovim/releases
+neovim_version="v0.12.2"
 neovim_name="nvim-linux-x86_64"
 neovim_tarball="${neovim_name}.tar.gz"
 neovim_url="https://github.com/neovim/neovim/releases/download/stable/${neovim_tarball}"
+neovim_url="https://github.com/neovim/neovim/releases/download/${neovim_version}/${neovim_tarball}"
 
 download_neovim()
 {
@@ -75,6 +77,12 @@ check_conflict()
 }
 
 
+# check
+if command -v nvim >/dev/null 2>&1; then
+    echo -e "\033[32m- [Warn] nvim has been exist\033[0m"
+    exit 0
+fi
+
 # download
 download_neovim
 
@@ -89,6 +97,6 @@ fi
 tar -xf $neovim_tarball --strip-components 1 -C /usr/ || exit 1
 
 
-echo -e "\033[32m- [Info] Install successfully...\033[0m"
+echo -e "\033[32m- [Info] Install nvim successfully...\033[0m"
 
 exit 0
