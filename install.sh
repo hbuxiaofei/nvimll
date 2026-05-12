@@ -131,7 +131,7 @@ python3 -c "import pynvim" >/dev/null 2>&1
 echo -e "\033[32m- [Info] Install successfully ...\033[0m"
 
 if [ ! -d $INSTALL_HOME/.config/coc/extensions/node_modules/coc-rust-analyzer ]; then
-    echo -e "\033[33m- [Info] Please open nvim and run :CocInstall coc-rust-analyzer \033[0m"
+    echo -e "\033[33m- [Info] Please open nvim and run :CocInstall coc-rust-analyzer@0.89.1 \033[0m"
 fi
 
 exit 0
