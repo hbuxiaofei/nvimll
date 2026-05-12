@@ -119,6 +119,7 @@ nmap <silent> <F7> :call LLvimNERDTreeToggle()<CR>
 
 
 " ctrlp
+let g:ctrlp_cmd = 'CtrlPBuffer'
 let g:ctrlp_working_path_mode = 'wa'
 let g:ctrlp_match_window = 'min:1,max:15,results:100'
 
