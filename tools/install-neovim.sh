@@ -12,7 +12,7 @@ neovim_url="https://github.com/neovim/neovim/releases/download/${neovim_version}
 download_neovim()
 {
     if [ -e "$neovim_tarball" ]; then
-        echo -e "\033[32m- [Info] $neovim_tarball has been exist\033[0m"
+        echo -e "\033[32m- [Warn] $neovim_tarball has been exist\033[0m"
         return 0
     fi
 

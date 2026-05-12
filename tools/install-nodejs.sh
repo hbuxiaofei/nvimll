@@ -7,7 +7,7 @@ INSTALL_HOME=$HOME
 
 # check
 if [ -e "$HOME/.config/nodejs/bin/node" ]; then
-    echo -e "\033[32m- [Info] nodejs has been exist\033[0m"
+    echo -e "\033[32m- [Warn] nodejs has been exist\033[0m"
     exit 0
 fi
 
