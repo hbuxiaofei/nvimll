@@ -84,12 +84,6 @@ if [ ! -d $INSTALL_HOME/.config ]; then
 fi
 cp -rf nvim $INSTALL_HOME/.config/
 
-
-# install command
-install_ripgrep
-install_neovim
-install_nodejs
-
 install_pynvim() {
     if command -v apt >/dev/null 2>&1; then
         run_cmd="apt install python3-pynvim -y"
@@ -127,6 +121,11 @@ install_pynvim() {
 
 python3 -c "import pynvim" >/dev/null 2>&1
 [ $? -ne 0 ] && install_pynvim
+
+# install command
+install_ripgrep
+install_neovim
+install_nodejs
 
 echo -e "\033[32m- [Info] Install successfully ...\033[0m"
 
