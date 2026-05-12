@@ -21,6 +21,7 @@ LSP features
 	CodeLens 				|coc-config-codeLens|
 	Colors 					|coc-config-colors|
 	Completion 				|coc-config-suggest|
+	Inline completion 			|coc-config-inlineSuggest|
 	Cursors 				|coc-config-cursors|
 	Diagnostics 				|coc-config-diagnostic|
 	Document highlight 			|coc-config-documentHighlight|
@@ -204,9 +205,21 @@ PREFERENCES
 
 "coc.preferences.enableMessageDialog"			*coc-preferences-enableMessageDialog*
 
-	Enable messages shown in notification dialog.
+	Enable messages shown in notification dialog. Deprecated, prefer configuration 'coc.preferences.messageDialogKind' instead.
 
 	Scope: `application`, default: `false`
+
+"coc.preferences.messageDialogKind"			*coc-preferences-messageDialogKind*
+
+	Configure the type of user interaction when an interactive message dialog occurs with more than zero actions to trigger.
+
+	Scope: `application`, default: `confirm`
+
+"coc.preferences.messageReportKind"			*coc-preferences-messageReportKind*
+
+	Configure the type of user interaction when a non-interactive message dialog occurs with zero actions to trigger.
+
+	Scope: `application`, default: `echo`
 
 "coc.preferences.excludeImageLinksInMarkdownDocument"	*coc-preferences-excludeImageLinksInMarkdownDocument*
 
@@ -814,6 +827,13 @@ DIAGNOSTIC
 
 	Scope: `language-overridable`, default: `false`
 
+"diagnostic.displayByVimDiagnostic"			*coc-config-diagnostic-displayByVimDiagnostic*
+
+	Set diagnostics to nvim's `vim.diagnostic`, and prevent coc.nvim's
+	handler to display in virtualText/floating window etc.
+
+	Scope: `language-overridable`, default: `false`
+
 "diagnostic.enable"					*coc-config-diagnostic-enable*
 
 	Set to false to disable diagnostic display.
@@ -968,7 +988,7 @@ DIAGNOSTIC
 
 "diagnostic.virtualTextAlign"				*coc-config-diagnostic-virtualTextAlign*
 
-	Position of virtual text. Vim9 only.
+	Position of virtual text.
 
 	Scope: `language-overridable`, default: `"after"`
 
@@ -993,7 +1013,7 @@ DIAGNOSTIC
 
 "diagnostic.virtualTextLimitInOneLine"			*coc-config-diagnostic-virtualTextLimitInOneLine*
 
-	The maximum number of diagnostic messages to disaply in one line.
+	The maximum number of diagnostic messages to display in one line.
 
 	Scope: `language-overridable`, default: `999`
 
@@ -1935,6 +1955,24 @@ SUGGEST
 	complete item.
 
 	Scope: `application`, default: `false`
+
+------------------------------------------------------------------------------
+INLINE COMPLETION
+							*coc-config-inlineSuggest*
+
+"inlineSuggest.autoTrigger"				*coc-config-inlineSuggest-autoTrigger*
+
+	Enable automatically trigger inline completion after completion done
+	or cursor hold.
+
+	Scope: `language-overridable`, default: `true`
+
+"inlineSuggest.triggerCompletionWait"   		*coc-config-inlineSuggest-triggerCompletionWait*
+
+	Wait time in milliseconds between text synchronize and trigger inline
+	completion.
+
+	Scope: `language-overridable`, default: `10`
 
 ------------------------------------------------------------------------------
 TYPEHIERARCHY

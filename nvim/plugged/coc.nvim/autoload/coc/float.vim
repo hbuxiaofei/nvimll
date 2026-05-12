@@ -114,12 +114,13 @@ endfunction
 " - zindex: (optional) zindex of window, default 50.
 " - borderchars: (optional) borderchars, should be length of 8
 " - nopad: (optional) not add pad when 1
+" - filter: (optional) filter property on vim9.
 " - index: (optional) line index
 function! coc#float#create_float_win(winid, bufnr, config) abort
   let lines = get(a:config, 'lines', v:null)
   let bufnr = a:bufnr
   try
-    let bufnr = coc#float#create_buf(a:bufnr, lines, 'hide')
+    let bufnr = coc#float#create_buf(a:bufnr, lines, get(a:config, 'bufhidden', 'hide'))
   catch /E523:/
     " happens when using getchar() #3921
     return []
@@ -194,6 +195,7 @@ function! coc#float#create_float_win(winid, bufnr, config) abort
       call popup_setoptions(a:winid, opts)
       call win_execute(a:winid, 'exe '.lnum)
       call coc#float#vim_buttons(a:winid, a:config)
+      call s:track_cursor_float(a:winid, a:config)
       call s:add_highlights(a:winid, a:config, 0)
       return [a:winid, winbufnr(a:winid)]
     else
@@ -208,6 +210,7 @@ function! coc#float#create_float_win(winid, bufnr, config) abort
       call nvim_win_set_config(a:winid, config)
       call nvim_win_set_cursor(a:winid, [lnum, 0])
       call coc#float#nvim_create_related(a:winid, config, a:config)
+      call s:track_cursor_float(a:winid, a:config)
       call s:add_highlights(a:winid, a:config, 0)
       return [a:winid, bufnr]
     endif
@@ -240,6 +243,9 @@ function! coc#float#create_float_win(winid, bufnr, config) abort
           \ 'scrollbarhighlight': 'CocFloatSbar',
           \ 'thumbhighlight': 'CocFloatThumb',
           \ }
+    if type(get(a:config, 'filter', v:null)) == v:t_func
+      let opts['filter'] = get(a:config, 'filter', v:null)
+    endif
     noa let winid = popup_create(bufnr, opts)
     call s:set_float_defaults(winid, a:config)
     call win_execute(winid, 'exe '.lnum)
@@ -256,6 +262,7 @@ function! coc#float#create_float_win(winid, bufnr, config) abort
     call coc#float#nvim_create_related(winid, config, a:config)
     call coc#float#nvim_set_winblend(winid, get(a:config, 'winblend', v:null))
   endif
+  call s:track_cursor_float(winid, a:config)
   call s:add_highlights(winid, a:config, 1)
   let g:coc_last_float_win = winid
   call coc#util#do_autocmd('CocOpenFloat')
@@ -622,8 +629,7 @@ function! coc#float#get_float_win_list(...) abort
     return filter(popup_list(), 'popup_getpos(v:val)["visible"]'.(list_all ? '' : '&& getwinvar(v:val, "float", 0)'))
   else
     let res = []
-    for i in range(1, winnr('$'))
-      let id = win_getid(i)
+    for id in nvim_list_wins()
       let config = nvim_win_get_config(id)
       if empty(config) || empty(config['relative'])
         continue
@@ -644,8 +650,7 @@ function! coc#float#get_float_by_kind(kind) abort
     return get(filter(popup_list(), 'popup_getpos(v:val)["visible"] && getwinvar(v:val, "kind", "") ==# "'.a:kind.'"'), 0, 0)
   else
     let res = []
-    for i in range(1, winnr('$'))
-      let winid = win_getid(i)
+    for winid in nvim_list_wins()
       let config = nvim_win_get_config(winid)
       if !empty(config['relative']) && getwinvar(winid, 'kind', '') ==# a:kind
         return winid
@@ -748,6 +753,42 @@ function! coc#float#nvim_refresh_scrollbar(winid) abort
   endif
 endfunction
 
+function! coc#float#reposition_cursor_floats(event) abort
+  if empty(a:event) | return | endif
+  for winid in coc#float#get_float_win_list()
+    let source = getwinvar(winid, 'cursor_float_source', 0)
+    if !source | continue | endif
+    let evt = get(a:event, string(source), {})
+    let dy = -get(evt, 'topline', 0)
+    let dx = -get(evt, 'leftcol', 0)
+    if dy == 0 && dx == 0 | continue | endif
+    call s:move_cursor_float(winid, dy, dx)
+  endfor
+endfunction
+
+function! s:move_cursor_float(winid, dy, dx) abort
+  let winids = [a:winid] + getwinvar(a:winid, 'related', [])
+  if s:is_vim
+    for w in winids
+      if coc#float#valid(w)
+        let p = popup_getpos(w)
+        call popup_move(w, {'line': p['line'] + a:dy, 'col': p['col'] + a:dx})
+      endif
+    endfor
+  else
+    for w in winids
+      if nvim_win_is_valid(w)
+        let [r, c] = nvim_win_get_position(w)
+        if r == 0 && c == 0
+          let config = nvim_win_get_config(w)
+          let [r, c] = [config['row'], config['col']]
+        endif
+        call nvim_win_set_config(w, {'relative': 'editor', 'row': r + a:dy, 'col': c + a:dx})
+      endif
+    endfor
+  endif
+endfunction
+
 function! coc#float#on_close(winid) abort
   let winids = coc#float#get_float_win_list()
   for winid in winids
@@ -776,7 +817,7 @@ function! coc#float#close_related(winid, ...) abort
         call coc#float#close(id, 1)
       elseif s:is_vim
         " vim doesn't throw
-        noa call popup_close(id)
+        call s:close_win(id, 1)
       else
         silent! noa call nvim_win_close(id, 1)
       endif
@@ -1170,7 +1211,28 @@ function! s:close_win(winid, noautocmd) abort
   " vim not throw for none exists winid
   if s:is_vim
     let prefix = a:noautocmd ? 'noa ': ''
-    exe prefix.'call popup_close('.a:winid.')'
+    let pos = popup_getpos(a:winid)
+    if empty(pos)
+      return
+    endif
+    if get(pos, 'visible', 0)
+      exe prefix.'call popup_close('.a:winid.')'
+      return
+    endif
+    " popup_close() is a no-op when called from a tabpage other than the
+    " one that owns the popup. Use popup_getoptions() to find the owning
+    " tab directly and switch to it to close the popup.
+    let owning_tab = get(popup_getoptions(a:winid), 'tabpage', -1)
+    if owning_tab > 0 && owning_tab != tabpagenr()
+      " tab-specific popup owned by another tab; switch there to close it.
+      let saved = tabpagenr()
+      silent! noa exe 'tabnext '.owning_tab
+      exe prefix.'call popup_close('.a:winid.')'
+      silent! noa exe 'tabnext '.saved
+    else
+      " global popup (tabpage == -1): popup_close() works from any tab.
+      exe prefix.'call popup_close('.a:winid.')'
+    endif
   else
     if nvim_win_is_valid(a:winid)
       let prefix = a:noautocmd ? 'noa ': ''
@@ -1349,6 +1411,10 @@ function! s:win_setview(winid, topline, lnum) abort
     call win_execute(a:winid, 'call winrestview({"lnum":'.a:lnum.',"topline":'.a:topline.'})')
     call timer_start(1, { -> coc#float#nvim_refresh_scrollbar(a:winid) })
   endif
+endfunction
+
+function! s:track_cursor_float(winid, config) abort
+  call setwinvar(a:winid, 'cursor_float_source', get(a:config, 'relative', '') ==# 'cursor' ? win_getid() : 0)
 endfunction
 
 function! s:set_float_defaults(winid, config) abort

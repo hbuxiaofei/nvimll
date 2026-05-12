@@ -39,6 +39,9 @@ if get(g:, 'coc_start_at_startup', 1) && !s:is_gvim
 endif
 
 function! CocTagFunc(pattern, flags, info) abort
+  " tagfunc can't be set in the sandbox mode, preload the following functions
+  silent! call coc#cursor#move_to()
+  silent! call coc#string#character_index()
   if a:flags !=# 'c'
     " use standard tag search
     return v:null
@@ -52,6 +55,8 @@ function! CocPopupCallback(bufnr, arglist) abort
     if a:arglist[0] == 'confirm'
       call coc#rpc#notify('PromptInsert', [a:arglist[1], a:bufnr])
     elseif a:arglist[0] == 'exit'
+      " notify exit for vim terminal prompt to ensure cleanup
+      call coc#rpc#notify('PromptExit', [a:bufnr])
       execute 'silent! bd! '.a:bufnr
       "call coc#rpc#notify('PromptUpdate', [a:arglist[1]])
     elseif a:arglist[0] == 'change'
@@ -265,10 +270,7 @@ endfunction
 
 function! s:HandleBufEnter(bufnr) abort
   if s:is_vim
-    if type(a:bufnr) == v:t_number && bufloaded(a:bufnr)
-      " The buffer could be hidden before, lines may not synchronized
-      call listener_flush(a:bufnr)
-    endif
+    call coc#api#Buf_flush(a:bufnr)
   endif
   call s:Autocmd('BufEnter', a:bufnr)
 endfunction
@@ -280,7 +282,7 @@ endfunction
 function! s:HandleTextChangedI(event, bufnr) abort
   if s:is_vim
     " make sure lines event before changed event.
-    call listener_flush(a:bufnr)
+    call coc#api#Buf_flush(a:bufnr)
   endif
   call s:Autocmd(a:event, a:bufnr, coc#util#change_info())
 endfunction
@@ -288,7 +290,7 @@ endfunction
 function! s:HandleTextChanged(bufnr) abort
   if s:is_vim
     " make sure lines event before changed event.
-    call listener_flush(a:bufnr)
+    call coc#api#Buf_flush(a:bufnr)
   endif
   call s:Autocmd('TextChanged', a:bufnr, getbufvar(a:bufnr, 'changedtick'))
 endfunction
@@ -299,6 +301,7 @@ function! s:HandleInsertLeave(bufnr) abort
 endfunction
 
 function! s:HandleWinScrolled(winid, event) abort
+  call coc#float#reposition_cursor_floats(a:event)
   if getwinvar(a:winid, 'float', 0)
     call coc#float#nvim_scrollbar(a:winid)
   endif
@@ -482,6 +485,7 @@ function! s:StaticHighlight() abort
   " Notification
   hi default CocNotificationProgress  ctermfg=Blue    guifg=#15aabf guibg=NONE
   hi default link CocNotificationButton  CocUnderline
+  hi default link CocNotificationKey     Comment
   hi default link CocNotificationError   CocErrorFloat
   hi default link CocNotificationWarning CocWarningFloat
   hi default link CocNotificationInfo    CocInfoFloat
@@ -505,6 +509,12 @@ function! s:StaticHighlight() abort
   hi default link CocPumVirtualText        CocVirtualText
   hi default link CocInputBoxVirtualText   CocVirtualText
   hi default link CocFloatDividingLine     CocVirtualText
+  if &t_Co == 256
+    hi def CocInlineVirtualText guifg=#808080 ctermfg=244
+  else
+    hi def CocInlineVirtualText guifg=#808080 ctermfg=12
+  endif
+  hi def link CocInlineAnnotation MoreMsg
 endfunction
 
 call s:StaticHighlight()
@@ -664,14 +674,14 @@ function! s:ShowInfo()
     else
       let output = trim(system(node . ' --version'))
       let ms = matchlist(output, 'v\(\d\+\).\(\d\+\).\(\d\+\)')
-      if empty(ms) || str2nr(ms[1]) < 16 || (str2nr(ms[1]) == 16 && str2nr(ms[2]) < 18)
-        call add(lines, 'Error: Node version '.output.' < 16.18.0, please upgrade node.js')
+      if empty(ms) || str2nr(ms[1]) < 20 || (str2nr(ms[1]) == 20 && str2nr(ms[2]) < 19)
+        call add(lines, 'Error: Node version '.output.' < 20.19.0, please upgrade node.js')
       endif
     endif
     " check bundle
     let file = s:root.'/build/index.js'
     if !filereadable(file)
-      call add(lines, 'Error: javascript bundle not found, please compile code of coc.nvim by esbuild.')
+      call add(lines, 'Error: javascript bundle not found, please compile code of coc.nvim by npm run build.')
     endif
     if !empty(lines)
       botright vnew
@@ -743,22 +753,22 @@ augroup END
 
 " Default key-mappings for completion
 if empty(mapcheck('<C-n>', 'i'))
-  inoremap <silent><expr> <C-n> coc#pum#visible() ? coc#pum#next(1) : "\<C-n>"
+  inoremap <silent><expr> <C-n> coc#pum#visible() ? coc#pum#next(1) : coc#inline#visible() ? coc#inline#next() : "\<C-n>"
 endif
 if empty(mapcheck('<C-p>', 'i'))
-  inoremap <silent><expr> <C-p> coc#pum#visible() ? coc#pum#prev(1) : "\<C-p>"
+  inoremap <silent><expr> <C-p> coc#pum#visible() ? coc#pum#prev(1) : coc#inline#visible() ? coc#inline#prev() : "\<C-p>"
 endif
 if empty(mapcheck('<down>', 'i'))
-  inoremap <silent><expr> <down> coc#pum#visible() ? coc#pum#next(0) : "\<down>"
+  inoremap <silent><expr> <down> coc#pum#visible() ? coc#pum#next(0) : coc#inline#visible() ? coc#inline#next() :"\<down>"
 endif
 if empty(mapcheck('<up>', 'i'))
-  inoremap <silent><expr> <up> coc#pum#visible() ? coc#pum#prev(0) : "\<up>"
+  inoremap <silent><expr> <up> coc#pum#visible() ? coc#pum#prev(0) : coc#inline#visible() ? coc#inline#prev() :"\<up>"
 endif
 if empty(mapcheck('<C-e>', 'i'))
-  inoremap <silent><expr> <C-e> coc#pum#visible() ? coc#pum#cancel() : "\<C-e>"
+  inoremap <silent><expr> <C-e> coc#pum#visible() ? coc#pum#cancel() : coc#inline#visible() ? coc#inline#cancel() : "\<C-e>"
 endif
 if empty(mapcheck('<C-y>', 'i'))
-  inoremap <silent><expr> <C-y> coc#pum#visible() ? coc#pum#confirm() : "\<C-y>"
+  inoremap <silent><expr> <C-y> coc#pum#visible() ? coc#pum#confirm() : coc#inline#visible() ? coc#inline#accept() :"\<C-y>"
 endif
 if empty(mapcheck('<PageDown>', 'i'))
   inoremap <silent><expr> <PageDown> coc#pum#visible() ? coc#pum#scroll(1) : "\<PageDown>"

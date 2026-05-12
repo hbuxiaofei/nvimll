@@ -2,7 +2,7 @@ scriptencoding utf-8
 let s:root = expand('<sfile>:h:h:h')
 let s:is_win = has('win32') || has('win64')
 let s:is_vim = !has('nvim')
-let s:vim_api_version = 37
+let s:vim_api_version = 38
 let s:is_win32unix = has('win32unix')
 let s:win32unix_prefix = ''
 let s:win32unix_fix_home = 0
@@ -134,7 +134,9 @@ function! coc#util#job_command()
     endif
     return
   endif
-  return [node] + get(g:, 'coc_node_args', ['--no-warnings']) + [s:root.'/build/index.js']
+
+  let default = ['--no-warnings']
+  return [node] + get(g:, 'coc_node_args', default) + [s:root.'/build/index.js']
 endfunction
 
 function! coc#util#open_file(cmd, file)
@@ -221,7 +223,28 @@ function! s:safer_open(cmd, file) abort
       endif
       let saved = &wildignore
       set wildignore=
-      execute a:cmd.' '.fnameescape(a:file)
+      let l:old_page_idx = tabpagenr()
+      let l:old_page_cnt = tabpagenr('$')
+      execute 'noautocmd '.a:cmd.' '.fnameescape(a:file)
+      if tabpagenr('$') > l:old_page_cnt
+        doautocmd TabNew
+        doautocmd BufNew
+        doautocmd BufAdd
+      endif
+      let l:new_page_idx = tabpagenr()
+      if l:new_page_idx != l:old_page_idx
+        exec 'noautocmd tabnext '.l:old_page_idx
+        doautocmd TabLeave
+        doautocmd BufLeave
+        exec 'noautocmd tabnext '.l:new_page_idx
+      endif
+      doautocmd TabEnter
+      doautocmd BufReadPre
+      doautocmd BufReadPost
+      doautocmd BufEnter
+      if l:new_page_idx != l:old_page_idx
+        doautocmd BufWinEnter
+      endif
       execute 'set wildignore='.saved
     else
       execute a:cmd.' '.fnameescape(a:file)
@@ -260,7 +283,10 @@ endfunction
 function! s:Call(method, args)
   try
     call call(a:method, a:args)
-    redraw
+    " don't redraw for command-line/prompt mode
+    if mode() !~# '^[cr]'
+      redraw
+    endif
   catch /.*/
     return 0
   endtry
@@ -283,7 +309,8 @@ function! coc#util#vim_info()
         \ 'filetypeMap': get(g:, 'coc_filetype_map', {}),
         \ 'version': coc#util#version(),
         \ 'pumevent': 1,
-        \ 'dialog': 1,
+        \ 'dialog': !s:is_vim || has('popupwin') ? v:true : v:false,
+        \ 'terminal': !s:is_vim || has('terminal') ? v:true : v:false,
         \ 'unixPrefix': s:win32unix_prefix,
         \ 'jumpAutocmd': coc#util#check_jump_autocmd(),
         \ 'isVim': s:is_vim ? v:true : v:false,
@@ -472,6 +499,7 @@ function! coc#util#get_bufoptions(bufnr, max) abort
         \ 'size': size,
         \ 'lines': lines,
         \ 'winid': bufwinid(a:bufnr),
+        \ 'winids': win_findbuf(a:bufnr),
         \ 'bufname': bufname,
         \ 'buftype': buftype,
         \ 'previewwindow': v:false,

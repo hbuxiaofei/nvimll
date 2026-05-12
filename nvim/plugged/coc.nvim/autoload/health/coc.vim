@@ -9,11 +9,11 @@ function! s:report_ok(report) abort
   endif
 endfunction
 
-function! s:report_error(report) abort
+function! s:report_error(report, advises) abort
   if has('nvim-0.10')
-    call v:lua.vim.health.error(a:report)
+    call v:lua.vim.health.error(a:report, a:advises)
   else
-    call health#report_error(a:report)
+    call health#report_error(a:report, a:advises)
   endif
 endfunction
 
@@ -56,9 +56,9 @@ function! s:checkEnvironment() abort
   if empty(ms)
     let valid = 0
     call s:report_error('Unable to detect version of node, make sure your node executable is http://nodejs.org/')
-  elseif str2nr(ms[1]) < 16 || (str2nr(ms[1]) == 16 && str2nr(ms[2]) < 18)
+  elseif str2nr(ms[1]) < 20 || (str2nr(ms[1]) == 20 && str2nr(ms[2]) < 19)
     let valid = 0
-    call s:report_warn('Node.js version '.trim(output).' < 16.18.0, please upgrade node.js')
+    call s:report_warn('Node.js version '.trim(output).' < 20.19.0, please upgrade node.js')
   endif
   if valid
     call s:report_ok('Environment check passed')
@@ -81,7 +81,7 @@ function! s:checkCommand()
   if filereadable(file)
     call s:report_ok('Javascript bundle build/index.js found')
   else
-    call s:report_error('Javascript entry not found, please compile coc.nvim by esbuild.')
+    call s:report_error('Javascript entry not found, please compile coc.nvim by npm run build.')
   endif
 endfunction
 
@@ -105,13 +105,17 @@ function! s:checkAutocmd()
 endfunction
 
 function! s:checkInitialize() abort
+  if get(g:, 'coc_start_at_startup', 1) == 0
+    call s:report_warn('coc.nvim was disabled on startup, run :CocStart to start manually')
+    return 1
+  endif
   if coc#client#is_running('coc')
     call s:report_ok('Service started')
     return 1
   endif
   call s:report_error('service could not be initialized', [
         \ 'Use command ":messages" to get error messages.',
-        \ 'Open a issue at https://github.com/neoclide/coc.nvim/issues for feedback.'
+        \ 'Open an issue at https://github.com/neoclide/coc.nvim/issues for feedback.'
         \])
   return 0
 endfunction

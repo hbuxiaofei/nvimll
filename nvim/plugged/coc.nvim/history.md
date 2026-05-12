@@ -2,6 +2,73 @@
 
 Notable changes of coc.nvim:
 
+## 2025-04-29
+
+- Break Change: minimal node version changed from 16.18.0 to 20.19.0.
+
+## 2025-11-22
+
+- Add configurable front end for reporting regular messages to the user, by using
+  'messageReportKind' which can be set to 'echo' or 'notification'.
+
+## 2025-07-30
+
+- Add configurable kind for dialog messages, through the use of the new configuration
+  'messageDialogKind' which can be set to 'menu', 'notification', or 'confirm'.
+
+## 2025-07-18
+
+- Add `extensionDependencies` support, declare dependencies on other extensions: `"extensionDependencies": ["extension-1", "extension-2"]`
+
+## 2025-07-17
+
+- Add notifications history, view with `:CocList notifications`
+
+## 2025-06-11
+
+- LSP 3.18 and latest vscode-languageclient features:
+    - SnippetTextEdit support
+        - Add `SnippetTextEdit` interface and namespace.
+        - The `TextDocumentEdit.edits` array now allows `SnippetTextEdit`.
+        - API `workspace.applyEdits()` now accepts `SnippetTextEdit`.
+        - Introduced `StringValue` to represent snippet strings (kind: 'snippet', value: string).
+    - Inline completion support, see `:h coc-inlineCompletion`
+        - Add `InlineCompletionItem` `InlineCompletionList` interface and namespace.
+        - Add enum `InlineCompletionTriggerKind`.
+        - Add interfaces `InlineCompletionContext` `InlineCompletionItemProvider`.
+        - Add method `languages.registerInlineCompletionItemProvider()`.
+        - Inline completion support of LanguageClient.
+        - Support `LanguageClient.getFeature('textDocument/inlineCompletion')`.
+        - Support inline completion middleware `Middleware.provideInlineCompletionItems`.
+    - Workspace‐edit metadata & applyEdit
+        - Add `metadata` to `ApplyWorkspaceEditParams`.
+        - Add `metadata` parameter to `workspace.applyEdit()`.
+    - Richer `ErrorHandler.error()` and `ErrorHandler.closed()` return types
+        - New interfaces `ErrorHandlerResult` and `CloseHandlerResult` (include
+            `action`, optional `message`, optional `handled` flag)
+        - `error()` and `closed()` may now return these richer results instead of bare enums.
+    - Trace & output‐channel improvements.
+        - Add `traceOutputChannel` to `LanguageClientOptions`.
+        - Middleware can now intercept all requests and notifications via
+            `sendRequest` and `sendNotification`.
+    - Delayed “didOpen” notifications
+        - Option `textSynchronization.delayOpenNotifications` was added to
+            `LanguageClientOptions` so that `didOpen` can wait until a document is
+            actually visible (or until another message is sent).
+    - Text‐document‐content provider support
+        - Registration type workspace/textDocumentContent to support custom‐
+            scheme content providers.
+        - Support `middleware.provideTextDocumentContent` of LanguageClient.
+        - Support `LanguageClient.getFeature('workspace/textDocumentContent')`.
+    - Support `transport` of `Executable` server option.  Transport could be
+      `pipe` and `socket`
+
+## 2025-06-02
+
+- Add function keys support to notification popups on vim9.
+- Use notification dialogs with actions (instead of menu picker) when
+  'enableMessageDialog' is enabled.
+
 ## 2025-05-21
 
 - Perform format on save after execute `editor.codeActionsOnSave`, the same as
@@ -1350,7 +1417,7 @@ Use `extensions` section for extension related configurations. Deprecated config
 - Fix possible invalid package.json.
 - Fix applyEdits not work sometimes.
 - Fix server still started when command search failed.
-- Fix log file not writeable.
+- Fix log file not writable.
 - Improve completion performance.
 
 ## 2019-01-03
@@ -1414,7 +1481,7 @@ Use `extensions` section for extension related configurations. Deprecated config
 
 - **Break change** configuration for module language server, transport now
   require specified value.
-- **Break change** new algorithm for socre complete items.
+- **Break change** new algorithm for score complete items.
 - Add command `workspace.clearWatchman`.
 - Add `quickfixs`, `doCodeAction` and `doQuickfix` actions.
 - Add `g:vim_node_rpc_args` for debug purpose.
