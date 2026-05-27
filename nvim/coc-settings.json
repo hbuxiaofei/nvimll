@@ -12,6 +12,7 @@
 
     // "rust-analyzer.cargo.features": [...]
 
+    "coc.preferences.messageLevel": "error",
     "snippets.userSnippetsDirectory": "~/.config/nvim/plugged/vim-snippets/snippets"
 
 }
