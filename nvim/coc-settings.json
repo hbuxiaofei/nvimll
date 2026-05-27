@@ -13,6 +13,9 @@
     // "rust-analyzer.cargo.features": [...]
 
     "coc.preferences.messageLevel": "error",
-    "snippets.userSnippetsDirectory": "~/.config/nvim/plugged/vim-snippets/snippets"
+    "snippets.userSnippetsDirectory": "~/.config/nvim/plugged/vim-snippets/snippets",
 
+    // https://github.com/fannheyward/coc-rust-analyzer/blob/master/coc-rust-analyzer-configurations.json
+    "rust-analyzer.updates.checkOnStartup": false,
+    "rust-analyzer.updates.prompt": false
 }
