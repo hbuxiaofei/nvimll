@@ -95,7 +95,8 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#buffer_nr_show = 1
 nmap - <Plug>AirlineSelectPrevTab
 nmap = <Plug>AirlineSelectNextTab
-nmap <silent> + :call LLvimAirlineBufferClose()<CR>
+nmap <silent> _ :call LLvimAirlineCloseBuffer()<CR>
+nmap <silent> + :call LLvimAirlineCloseOtherBuffers()<CR>
 
 
 " tagbar

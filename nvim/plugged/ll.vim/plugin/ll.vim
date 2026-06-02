@@ -76,13 +76,30 @@ function! LLvimNERDTreeToggle()
 endfunction
 
 
-function! LLvimAirlineBufferClose()
+function! LLvimAirlineCloseBuffer()
   let l:buffer_cur_number = buffer_number()
-  if g:NERDTree.IsOpen()
+  if exists('g:NERDTree') && g:NERDTree.IsOpen()
     if l:buffer_cur_number == s:nerdtree_buffer_number
       return
     endif
   endif
   exe "bn"
   exe "bd " . l:buffer_cur_number
+endfunction
+
+
+function! LLvimAirlineCloseOtherBuffers()
+  let l:buffer_cur_number = buffer_number()
+  for l:buf in getbufinfo({'buflisted': 1})
+    let l:bufnr = l:buf.bufnr
+    if l:bufnr == l:buffer_cur_number
+      continue
+    endif
+    if exists('g:NERDTree') && g:NERDTree.IsOpen()
+      if l:buffer_cur_number == s:nerdtree_buffer_number
+        continue
+      endif
+    endif
+    silent! execute 'bd ' . l:bufnr
+  endfor
 endfunction
