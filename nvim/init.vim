@@ -50,6 +50,7 @@ syntax enable
 set cursorline
 
 " colorscheme peachpuff
+" colorscheme github
 colorscheme monokai
 
 set history=1024
