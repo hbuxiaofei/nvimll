@@ -77,29 +77,60 @@ endfunction
 
 
 function! LLvimAirlineCloseBuffer()
-  let l:buffer_cur_number = buffer_number()
-  if exists('g:NERDTree') && g:NERDTree.IsOpen()
-    if l:buffer_cur_number == s:nerdtree_buffer_number
-      return
-    endif
+  let l:current = bufnr('%')
+
+  if &filetype ==# 'nerdtree' || (exists('t:NERDTreeBufName') && bufname('%') == t:NERDTreeBufName)
+    return
   endif
-  exe "bn"
-  exe "bd " . l:buffer_cur_number
+
+  let l:alternate = bufnr('#')
+  if buflisted(l:alternate)
+    buffer #
+  else
+    bnext
+  endif
+  execute 'silent! bdelete ' . l:current
+
+  if exists('g:airline_buflist_cache')
+    unlet g:airline_buflist_cache
+  endif
+  if exists(':AirlineRefresh')
+    execute 'AirlineRefresh'
+  endif
+
+  redraw!
 endfunction
 
 
 function! LLvimAirlineCloseOtherBuffers()
-  let l:buffer_cur_number = buffer_number()
-  for l:buf in getbufinfo({'buflisted': 1})
+  let l:buffer_cur_number = bufnr('%')
+  let l:nt_bufnr = -1
+  if exists('t:NERDTreeBufName')
+    let l:nt_bufnr = bufnr(t:NERDTreeBufName)
+  endif
+
+  for l:buf in getbufinfo()
     let l:bufnr = l:buf.bufnr
     if l:bufnr == l:buffer_cur_number
       continue
     endif
-    if exists('g:NERDTree') && g:NERDTree.IsOpen()
-      if l:buffer_cur_number == s:nerdtree_buffer_number
-        continue
-      endif
+
+    if l:bufnr == l:nt_bufnr
+      continue
     endif
-    silent! execute 'bd ' . l:bufnr
+
+    if l:buf.loaded || l:buf.listed
+      silent! execute 'bdelete! ' . l:bufnr
+    endif
   endfor
+
+  if exists('g:airline_buflist_cache')
+    unlet g:airline_buflist_cache
+  endif
+
+  if exists(':AirlineRefresh')
+    execute 'AirlineRefresh'
+  endif
+
+  redraw!
 endfunction
